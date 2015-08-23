@@ -1,0 +1,108 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{934AE80E-AB60-42F0-A94D-3E97A4AB258E}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Prolog</RootNamespace>
+    <AssemblyName>Prolog</AssemblyName>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="UnityEngine">
+      <HintPath>..\UnityEngine.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="AlphaConvertibleTerm.cs" />
+    <Compile Include="ArgumentCountException.cs" />
+    <Compile Include="ArgumentTypeException.cs" />
+    <Compile Include="BadProcedureException.cs" />
+    <Compile Include="ByteCompiledRule.cs" />
+    <Compile Include="ConfigurationOptions.cs" />
+    <Compile Include="Console.cs" />
+    <Compile Include="CSVParser.cs" />
+    <Compile Include="CutStateSequencer.cs" />
+    <Compile Include="DebugOverlay.cs" />
+    <Compile Include="DelegateUtils.cs" />
+    <Compile Include="DocumentationAttribute.cs" />
+    <Compile Include="ELInspector.cs" />
+    <Compile Include="ELNode.cs" />
+    <Compile Include="ELNodeEnumerator.cs" />
+    <Compile Include="ELNodeExclusionException.cs" />
+    <Compile Include="ELProlog.cs" />
+    <Compile Include="FunctionalExpression.cs" />
+    <Compile Include="GenericArithmetic.cs" />
+    <Compile Include="GoalException.cs" />
+    <Compile Include="Indexical.cs" />
+    <Compile Include="InferenceStepsExceededException.cs" />
+    <Compile Include="InstantiationException.cs" />
+    <Compile Include="ISOPrologReader.cs" />
+    <Compile Include="ISOPrologWriter.cs" />
+    <Compile Include="KB.cs" />
+    <Compile Include="KnowledgeBase.cs" />
+    <Compile Include="KnowledgeBaseEntry.cs" />
+    <Compile Include="KnowledgeBaseRule.cs" />
+    <Compile Include="KnowledgeBaseVariable.cs" />
+    <Compile Include="LogicVariable.cs" />
+    <Compile Include="Manual.cs" />
+    <Compile Include="Metastructure.cs" />
+    <Compile Include="PauseManager.cs" />
+    <Compile Include="PositionTrackingTextReader.cs" />
+    <Compile Include="PredicateArgumentIndexer.cs" />
+    <Compile Include="PredicateIndicator.cs" />
+    <Compile Include="PredicateInfo.cs" />
+    <Compile Include="Prolog.cs" />
+    <Compile Include="PrologChecker.cs" />
+    <Compile Include="PrologConsole.cs" />
+    <Compile Include="PrologContext.cs" />
+    <Compile Include="PrologError.cs" />
+    <Compile Include="PrologException.cs" />
+    <Compile Include="PrologPrimitives.cs" />
+    <Compile Include="PrologWarning.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Repl.cs" />
+    <Compile Include="Shuffler.cs" />
+    <Compile Include="SourceFileTracker.cs" />
+    <Compile Include="StoragePool.cs" />
+    <Compile Include="StringUtils.cs" />
+    <Compile Include="Structure.cs" />
+    <Compile Include="Symbol.cs" />
+    <Compile Include="SyntaxErrorException.cs" />
+    <Compile Include="Term.cs" />
+    <Compile Include="TypeUtils.cs" />
+    <Compile Include="UndefinedPredicateException.cs" />
+    <Compile Include="UnityExtensionMethods.cs" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

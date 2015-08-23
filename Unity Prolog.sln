@@ -1,0 +1,41 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Prolog", "Prolog\Prolog.csproj", "{934AE80E-AB60-42F0-A94D-3E97A4AB258E}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Editor", "Editor", "{D8AF9B3B-4C18-4971-B988-616C117FD7C9}"
+	ProjectSection(SolutionItems) = preProject
+		Editor\CopyFilesOnBuild.cs = Editor\CopyFilesOnBuild.cs
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Manual generator", "Manual generator\Manual generator.csproj", "{30BAC764-AC7B-457F-9715-C2CE2EC4F72A}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Documentation", "Documentation", "{1B4C6004-1855-498B-A8F9-18BA0985444C}"
+	ProjectSection(SolutionItems) = preProject
+		Documentation\Unity Prolog Reference.htm = Documentation\Unity Prolog Reference.htm
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{BA1E6454-2544-4A91-A27D-D0A3705518E9}"
+	ProjectSection(SolutionItems) = preProject
+		README.md = README.md
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{934AE80E-AB60-42F0-A94D-3E97A4AB258E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{934AE80E-AB60-42F0-A94D-3E97A4AB258E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{934AE80E-AB60-42F0-A94D-3E97A4AB258E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{934AE80E-AB60-42F0-A94D-3E97A4AB258E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{30BAC764-AC7B-457F-9715-C2CE2EC4F72A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{30BAC764-AC7B-457F-9715-C2CE2EC4F72A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{30BAC764-AC7B-457F-9715-C2CE2EC4F72A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{30BAC764-AC7B-457F-9715-C2CE2EC4F72A}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
