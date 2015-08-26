@@ -29,7 +29,7 @@ using UnityEngine;
 
 namespace Prolog
 {
-    class PrologConsole : Console
+    public class PrologConsole : Console
     {
 #pragma warning disable 649
         public GameObject DefaultGameObject;

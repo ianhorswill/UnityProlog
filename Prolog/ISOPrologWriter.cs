@@ -48,7 +48,7 @@ using Object = System.Object;
 
 namespace Prolog
 {
-    internal class ISOPrologWriter
+    public class ISOPrologWriter
     {
         public ISOPrologWriter(TextWriter writer)
         {

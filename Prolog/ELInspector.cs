@@ -31,7 +31,7 @@ using UnityEngine;
 
 namespace Prolog
 {
-    class ELInspector : MonoBehaviour
+    public class ELInspector : MonoBehaviour
     {
         #region Editor-configurable properties
         public Rect WindowRect = new Rect(0, 0, 640, 480);

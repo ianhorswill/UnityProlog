@@ -32,7 +32,7 @@ namespace Prolog
     /// <summary>
     /// A wrapper for a Prolog KnowledgeBase as a Unity Component.
     /// </summary>
-    class KB : MonoBehaviour
+    public class KB : MonoBehaviour
     {
         private const string GlobalKBGameObjectName = "GlobalKB";
 
