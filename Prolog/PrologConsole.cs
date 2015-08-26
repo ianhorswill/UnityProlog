@@ -62,8 +62,8 @@ namespace Prolog
         {
 
             if (command != ";")
-                Out.Write("?- ");
-            Out.WriteLine(command);
+                Out.Write("<b>?- ");
+            Out.WriteLine(command+"</b>");
             repl.ProcessCommandLine(command);
         }
 
