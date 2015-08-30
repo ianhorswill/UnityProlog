@@ -1,0 +1,16 @@
+The overall design of the system is based on Jeff Thompson's Yield Prolog:
+
+   http://yieldprolog.sourceforge.net/
+
+although the system doesn't actually use any of his source code, and
+isn't a compiler.
+
+The reader is a transliteration into C# of Koen De Bosschere's
+public domain C-language Prolog reader.
+
+The Console window implementation is based on an EECS-399 by Lee Fan
+of Northwestern University.
+
+Eremic logic (aka exclusion logic) was developed by Richard Evans,
+although the implementation here is original.
+
