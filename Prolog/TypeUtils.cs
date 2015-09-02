@@ -228,6 +228,9 @@ namespace Prolog
             return value.GetType().InvokeMember(methodName, BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance | BindingFlags.InvokeMethod, null, value, args);
         }
 
+        private const BindingFlags FieldOrPropertyBindingFlags =
+            BindingFlags.IgnoreCase | BindingFlags.Instance | BindingFlags.Public | BindingFlags.Static;
+
         /// <summary>
         /// Returns the value of the object's specified field or property.
         /// </summary>
@@ -240,18 +243,18 @@ namespace Prolog
             {
                 // value is a type; check for both static fields and type fields.
                 // Check for static fields
-                FieldInfo f = t.GetField(memberName);
+                FieldInfo f = t.GetField(memberName, FieldOrPropertyBindingFlags);
                 if (f != null && f.IsStatic)
                     return f.GetValue(value);
-                PropertyInfo p = t.GetProperty(memberName);
+                PropertyInfo p = t.GetProperty(memberName, FieldOrPropertyBindingFlags);
                 if (p != null)
                     return p.GetValue(value, new object[0]);
                 // Now check for instance fields of the type object itself.
                 t = value.GetType();
-                f = t.GetField(memberName);
+                f = t.GetField(memberName, FieldOrPropertyBindingFlags);
                 if (f != null)
                     return f.GetValue(value);
-                p = t.GetProperty(memberName);
+                p = t.GetProperty(memberName, FieldOrPropertyBindingFlags);
                 if (p != null)
                     return p.GetValue(value, new object[0]);
             }
