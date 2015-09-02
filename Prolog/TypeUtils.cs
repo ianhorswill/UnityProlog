@@ -224,8 +224,13 @@ namespace Prolog
             if (methodName == null) throw new ArgumentNullException("methodName");
             var type = value as Type;
             if (type != null)
-                return type.InvokeMember(methodName, BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static | BindingFlags.InvokeMethod, null, type, args);
-            return value.GetType().InvokeMember(methodName, BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance | BindingFlags.InvokeMethod, null, value, args);
+                return type.InvokeMember(methodName,
+                    BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static 
+                    | BindingFlags.InvokeMethod | BindingFlags.OptionalParamBinding,
+                    null, type, args);
+            return value.GetType().InvokeMember(methodName,
+                BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance
+                | BindingFlags.InvokeMethod | BindingFlags.OptionalParamBinding, null, value, args);
         }
 
         private const BindingFlags FieldOrPropertyBindingFlags =
