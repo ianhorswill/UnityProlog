@@ -60,9 +60,9 @@ namespace Prolog
 
         protected override void Run(string command)
         {
-
+            Out.Write("<b>");
             if (command != ";")
-                Out.Write("<b>?- ");
+                Out.Write("?- ");
             Out.WriteLine(command+"</b>");
             repl.ProcessCommandLine(command);
         }
