@@ -455,7 +455,7 @@ namespace Prolog
             DefinePrimitive(s, implementationDelegate, manualSections, docstring, arglist);
         }
 
-        private static void DefinePrimitive(Symbol name, PrimitiveImplementation implementationDelegate,
+        internal static void DefinePrimitive(Symbol name, PrimitiveImplementation implementationDelegate,
                                             string manualSections, string docstring, params object[] arglist)
         {
             Implementations[name] = implementationDelegate;
@@ -479,7 +479,8 @@ namespace Prolog
             }
 
             DelegateUtils.NameProcedure(implementationDelegate, name.Name);
-            Manual.AddToSections(manualSections, implementationDelegate);
+            if (manualSections != null)
+                Manual.AddToSections(manualSections, implementationDelegate);
 
             for (int i = 0; i < arglist.Length; i++)
                 if (arglist[i] is string)

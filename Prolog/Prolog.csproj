@@ -41,6 +41,7 @@
     <Compile Include="ArgumentCountException.cs" />
     <Compile Include="ArgumentTypeException.cs" />
     <Compile Include="BadProcedureException.cs" />
+    <Compile Include="BinaryPrimitive.cs" />
     <Compile Include="ByteCompiledRule.cs" />
     <Compile Include="ConfigurationOptions.cs" />
     <Compile Include="Console.cs" />
