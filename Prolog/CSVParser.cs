@@ -53,7 +53,9 @@ namespace Prolog
                 // This is a list of prolog expressions - wrap it in  [ ]
                 List,
                 // This is a list of prolog expressions, but separated by spaces rather than commas
-                WordList
+                WordList,
+                // A list of WordLists, separated by commas
+                PhraseList,
             }
             private readonly FormatType type;
 
@@ -85,6 +87,23 @@ namespace Prolog
                         b.Append('[');
                         b.Append(item.Trim().Replace(' ', ','));
                         b.Append(']');
+                        break;
+
+                    case FormatType.PhraseList:
+                    {
+                        var gotOne = false;
+                        b.Append('[');
+                        foreach (var phrase in item.Trim().Split(new[] {','}, StringSplitOptions.RemoveEmptyEntries))
+                        {
+                            if (gotOne)
+                                b.Append(',');
+                            gotOne = true;
+                            b.Append('[');
+                            b.Append(phrase.Trim().Replace(' ', ','));
+                            b.Append(']');
+                        }
+                        b.Append(']');
+                    }
                         break;
 
                     default:
@@ -188,6 +207,8 @@ namespace Prolog
                     return new ColumnFormat(ColumnFormat.FormatType.List, null);
                 if (headerItem.EndsWith("(word list)"))
                     return new ColumnFormat(ColumnFormat.FormatType.WordList, null);
+                if (headerItem.EndsWith("(phrase list)"))
+                    return new ColumnFormat(ColumnFormat.FormatType.PhraseList, null);
 
                 // ReSharper disable once StringIndexOfIsCultureSpecific.1
                 var prefixSpec = headerItem.IndexOf(PrefixHeader);
