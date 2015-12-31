@@ -199,6 +199,22 @@ namespace Prolog
         }
 
         /// <summary>
+        /// Iterates over items in a Prolog list.
+        /// </summary>
+        [SuppressMessage("Microsoft.Design", "CA1002:DoNotExposeGenericLists"), Documentation("Convert a Prolog-format list into a .NET IList.")]
+        public static IEnumerable PrologListItems(object prologList)
+        {
+            object current = Term.Deref(prologList);
+            while (current != null)
+            {
+                var t = current as Structure;
+                if (t == null) throw new ArgumentException("List is not a proper list; it ends with: " + current);
+                yield return t.Argument(0);
+                current = t.Argument(1);
+            }
+        }
+
+        /// <summary>
         /// Convert a Prolog-format list into an object[] array.
         /// </summary>
         [Documentation("Convert a Prolog-format list into an object[].")]
