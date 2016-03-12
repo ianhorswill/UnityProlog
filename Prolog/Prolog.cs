@@ -129,6 +129,21 @@ namespace Prolog
             return LexicalItems.ContainsKey(l); // || Symbol.IsInterned(l);
         }
 
+        /// <summary>
+        /// True if string is a prefix of some lexical item other than the string itself.
+        /// </summary>
+        public static bool IsPrefixOfDistinctLexicalItem(string s)
+        {
+            foreach (var pair in LexicalItems)
+            {
+                var item = pair.Key;
+                if (item != s && item.StartsWith(s))
+                    return true;
+            }
+
+            return false;
+        }
+
         public static void RegisterLexicalItem(Symbol s)
         {
             LexicalItems[s.Name.ToLower()] = s;
