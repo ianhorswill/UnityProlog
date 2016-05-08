@@ -71,7 +71,7 @@ namespace Prolog
                         foreach (var item in displayItems)
                         {
                             if (item is string)
-                                GUILayout.Label((string) item, Style);
+                                GUILayout.Label((string) item, Style, GUILayout.MaxWidth(Screen.width));
                             if (item is Table)
                                 ((Table) item).Render();
                         }
