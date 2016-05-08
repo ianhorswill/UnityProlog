@@ -132,7 +132,7 @@ namespace Prolog
         /// Attempts to prove the specified goal.
         /// WARNING: THIS WILL LEAK A PROLOG CONTEXT UNLESS ENUMERATED TO COMPLETION.
         /// </summary>
-        internal IEnumerable<bool> Prove(Structure t)
+        public IEnumerable<bool> Prove(Structure t)
         {
             using (var prologContext = PrologContext.Allocate(this, null))
             {
