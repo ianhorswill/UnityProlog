@@ -2267,14 +2267,18 @@ namespace Prolog
                     throw new InstantiationException(v, "Structure argument was not instantiated.");
                 throw new ArgumentTypeException("arg", "structure", args[1], typeof(Structure));
             }
-            if (!(args[0] is int))
+
+	    var numberArg = Term.Deref(args[0]);
+            if (!(numberArg is int))
             {
-                var v = args[0] as LogicVariable;
+                var v = numberArg as LogicVariable;
                 if (v != null)
                     return EnumerateStructureArguments(v, s, Term.Deref(args[2]));
                 throw new ArgumentTypeException("arg", "argument_number", args[0], typeof(int));
             }
-            var argNumber = (int) Term.Deref(args[0]);
+
+            var argNumber = (int) numberArg;
+            
             if (argNumber < 0)
                 throw new IndexOutOfRangeException("The specified argument number is invalid.");
             if (argNumber == 0 || argNumber > s.Arguments.Length)
