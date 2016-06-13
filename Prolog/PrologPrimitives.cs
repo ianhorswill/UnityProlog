@@ -51,12 +51,13 @@ namespace Prolog
             return Symbol.Intern("unknown_primitive");
         }
 
-        internal static IEnumerable<CutState> StackCall(PrimitiveImplementation primitive, int arity, PrologContext context)
+        internal static IEnumerable<CutState> StackCall(PrimitiveImplementation primitive, int arity,
+            PrologContext context)
         {
             return primitive(context.GetCallArgumentsAsArray(arity), context);
         }
 
-            /// <summary>
+        /// <summary>
         /// Adds primitvies to the primitives table
         /// </summary>
         [SuppressMessage("Microsoft.Maintainability", "CA1502:AvoidExcessiveComplexity")
@@ -64,25 +65,26 @@ namespace Prolog
         internal static void InstallPrimitives()
         {
             DefinePrimitive(Symbol.Comma, AndImplementation, "flow control", "True if both goals are true.", ":goal1",
-                            ":goal2");
+                ":goal2");
             DefinePrimitive(";", OrImplementation, "flow control", "True if both goals are true.", ":goal1", ":goal2");
             DefinePrimitive("->", IfThenImplementation, "flow control", "Proves CONSEQUENT if TEST is true.", ":test",
-                            ":consequent");
-            DefinePrimitive("not", NotImplementation, "flow control", "True if GOAL is unprovable.  GOAL must be ground.", "*goal");
+                ":consequent");
+            DefinePrimitive("not", NotImplementation, "flow control",
+                "True if GOAL is unprovable.  GOAL must be ground.", "*goal");
             DefinePrimitive("\\+", NotPlusImplementation, "flow control", "True if GOAL is unprovable", ":goal");
             DefinePrimitive("once", OnceImplementation, "flow control,meta-logical predicates",
-                            "Attempts to prove GOAL, but suppresses backtracking for a second solution.", ":goal");
+                "Attempts to prove GOAL, but suppresses backtracking for a second solution.", ":goal");
             DefinePrimitive("ignore", IgnoreImplementation, "flow control,meta-logical predicates",
-                            "Attempts to prove GOAL, but suppresses backtracking for a second solution.",
-                            ":goals", "...");
+                "Attempts to prove GOAL, but suppresses backtracking for a second solution.",
+                ":goals", "...");
             DefinePrimitive(Symbol.Call, CallImplementation, "flow control,meta-logical predicates",
-                            "Attempts to prove the specified GOAL, adding any additional arguments, if specified.",
-                            ":goal", "?optionalArguments", "...");
+                "Attempts to prove the specified GOAL, adding any additional arguments, if specified.",
+                ":goal", "?optionalArguments", "...");
             DefinePrimitive("apply", ApplyImplementation, "flow control,meta-logical predicates",
-                            "Adds arguments in ARGLIST to end of GOAL and attempts to prove the resulting goal.", ":goal",
-                            "+arglist");
+                "Adds arguments in ARGLIST to end of GOAL and attempts to prove the resulting goal.", ":goal",
+                "+arglist");
             DefinePrimitive("randomize", RandomizeImplementation, "meta-logical predicates",
-                            "Proves GOAL, while randomizing clause order for clauses declared randomizable.", ":goal");
+                "Proves GOAL, while randomizing clause order for clauses declared randomizable.", ":goal");
             DefinePrimitive("begin", BeginImplementation, "flow control,meta-logical predicates",
                 "Runs each goal in sequence, throwing an exception if any goal fails.  Cannot be backtracked.",
                 ":goal", "...");
@@ -93,54 +95,56 @@ namespace Prolog
                 "Attempts to prove the specified goal in the specified module.",
                 "*module", ":goal");
             DefinePrimitive("freeze", FreezeImplementation, "flow control,constraint programming",
-                            "Runs GOAL when VAR becomes bound; unification will fail if GOAL fails.", "?var", ":goal");
+                "Runs GOAL when VAR becomes bound; unification will fail if GOAL fails.", "?var", ":goal");
             DefinePrimitive("frozen", FrozenImplementation, "flow control,constraint programming",
-                            "Unifies GOAL with the goal frozen on TERM, if TERM is an unbound variable with a frozen goal; otherwise unifies GOAL with true.", "?term", "-goal");
+                "Unifies GOAL with the goal frozen on TERM, if TERM is an unbound variable with a frozen goal; otherwise unifies GOAL with true.",
+                "?term", "-goal");
             DefinePrimitive("dif", DifImplementation, "comparisons,constraint programming",
-                            "Requires that TERM1 and TERM2 never be equal.  If they are, the predicate fails.  If they are not, it forces any future unifications that would make them equal to fail.", "?term1", "?term2");
+                "Requires that TERM1 and TERM2 never be equal.  If they are, the predicate fails.  If they are not, it forces any future unifications that would make them equal to fail.",
+                "?term1", "?term2");
             DefinePrimitive("maplist", MapListImplementation, "list predicates,meta-logical predicates",
-                            "True if PREDICATE is true of all successive pairs of elements from LIST1 and LIST2.",
-                            ":predicate", "?list1", "?list2");
+                "True if PREDICATE is true of all successive pairs of elements from LIST1 and LIST2.",
+                ":predicate", "?list1", "?list2");
             DefinePrimitive("bind",
-                            BindImplementation,
-                            "declarations",
-                            "Dynamically binds IndexicalName to Value until this goal is backtracked.",
-                            "*IndexicalName", "=Value");
+                BindImplementation,
+                "declarations",
+                "Dynamically binds IndexicalName to Value until this goal is backtracked.",
+                "*IndexicalName", "=Value");
             DefinePrimitive("indexical",
-                            IndexicalImplementation,
-                            "declarations",
-                            "Declares that the specified name is an indexical name that can be bound using bind.",
-                            "*Name=*DefaultValue");
+                IndexicalImplementation,
+                "declarations",
+                "Declares that the specified name is an indexical name that can be bound using bind.",
+                "*Name=*DefaultValue");
             DefinePrimitive("indexical_named",
-                            IndexicalNamedImplementation,
-                            "term manipulation",
-                            "The INDEXICAL is an indexical object with name NAME.",
-                            "?name","?indexical");
+                IndexicalNamedImplementation,
+                "term manipulation",
+                "The INDEXICAL is an indexical object with name NAME.",
+                "?name", "?indexical");
             DefinePrimitive("randomizable",
-                            MakeDeclarationPredicate((p, context) => context.KnowledgeBase.DeclareRandomizable(p)),
-                            "flow control,declarations",
-                            "Declares that the specified predicate is allowed to have its clauses explored in random order, when clause randomization is enabled.",
-                            ":predicateIndicator", "...");
+                MakeDeclarationPredicate((p, context) => context.KnowledgeBase.DeclareRandomizable(p)),
+                "flow control,declarations",
+                "Declares that the specified predicate is allowed to have its clauses explored in random order, when clause randomization is enabled.",
+                ":predicateIndicator", "...");
             DefinePrimitive("shadow",
-                            MakeDeclarationPredicate((p, context) => context.KnowledgeBase.DeclareShadow(p)),
-                            "flow control,declarations",
-                            "Declares that declarations for the specified predicate are allowed in this knowledgebase and override any declarations in the parent.",
-                            ":predicateIndicator", "...");
+                MakeDeclarationPredicate((p, context) => context.KnowledgeBase.DeclareShadow(p)),
+                "flow control,declarations",
+                "Declares that declarations for the specified predicate are allowed in this knowledgebase and override any declarations in the parent.",
+                ":predicateIndicator", "...");
             DefinePrimitive("external",
-                            MakeDeclarationPredicate((p, context) => context.KnowledgeBase.DeclareExternal(p)),
-                            "flow control,declarations",
-                            "Declares that the specified predicate is optional to define and/or defined elsewhere; thus, it should not generate undefined predicate warnings.",
-                            ":predicateIndicator", "...");
+                MakeDeclarationPredicate((p, context) => context.KnowledgeBase.DeclareExternal(p)),
+                "flow control,declarations",
+                "Declares that the specified predicate is optional to define and/or defined elsewhere; thus, it should not generate undefined predicate warnings.",
+                ":predicateIndicator", "...");
             DefinePrimitive("public",
-                            MakeDeclarationPredicate((p, context) => context.KnowledgeBase.DeclarePublic(p)),
-                            "flow control,declarations",
-                            "Declares that the specified predicate is expected to be called from elsewhere.  It should not generate unreferenced predicate warnings.",
-                            ":predicateIndicator", "...");
+                MakeDeclarationPredicate((p, context) => context.KnowledgeBase.DeclarePublic(p)),
+                "flow control,declarations",
+                "Declares that the specified predicate is expected to be called from elsewhere.  It should not generate unreferenced predicate warnings.",
+                ":predicateIndicator", "...");
             DefinePrimitive("higher_order",
-                            DeclareHigherOrderImplementation,
-                            "flow control,declarations",
-                            "Declares that the specified predicate is may call its arguments as subgoals.  For example, higher_order(find_all(0,1,0)) means find_all/3 calls its second argument.  Used by the static checker to weed out unreferenced predicates.",
-                            ":predicateIndicator", "...");
+                DeclareHigherOrderImplementation,
+                "flow control,declarations",
+                "Declares that the specified predicate is may call its arguments as subgoals.  For example, higher_order(find_all(0,1,0)) means find_all/3 calls its second argument.  Used by the static checker to weed out unreferenced predicates.",
+                ":predicateIndicator", "...");
             DefinePrimitive("disassemble",
                 MakeDeclarationPredicate((p, context) => context.KnowledgeBase.Disassemble(p)),
                 "flow control",
@@ -152,152 +156,167 @@ namespace Prolog
                 "Declares that the predicate should be byte compiled rather than interpreted.",
                 ":predicateIndicator", "...");
             DefinePrimitive("predicate_property", PredicatePropertyImplementation, "declarations",
-                            "True if PROPERTY holds of the predicate of GOAL.",
-                            ":goal", "+property");
+                "True if PROPERTY holds of the predicate of GOAL.",
+                ":goal", "+property");
             DefinePrimitive("forall", ForAllImplementation, "all solutions predicates",
-                            "True if GOAL is true for all bindings of all solutions of GENERATOR.",
-                            ":generator", ":goal");
+                "True if GOAL is true for all bindings of all solutions of GENERATOR.",
+                ":generator", ":goal");
             DefinePrimitive("for_all_unique", ForAllUniqueImplementation, "all solutions predicates",
-                            "True if GOAL is true given variable bindings of each unique value of TEMPLATE produced by GENERATOR.",
-                            "-Template", ":generator", ":goal");
+                "True if GOAL is true given variable bindings of each unique value of TEMPLATE produced by GENERATOR.",
+                "-Template", ":generator", ":goal");
             DefinePrimitive("generate_unique", GenerateUniqueImplementation, "all solutions predicates",
-                            "Succeeds once for each unique value of TEMPLATE produced by GENERATOR.",
-                            "-Template", ":generator");
+                "Succeeds once for each unique value of TEMPLATE produced by GENERATOR.",
+                "-Template", ":generator");
             DefinePrimitive("findall", FindallImplementation, "all solutions predicates",
-                            "Unifies SOLUTIONS with a list of every value of TEMPLATE for every possible solution of GOAL.",
-                            "=template", ":goal", "-solutions");
+                "Unifies SOLUTIONS with a list of every value of TEMPLATE for every possible solution of GOAL.",
+                "=template", ":goal", "-solutions");
             DefinePrimitive("findnsols", FindNSolsImplementation, "all solutions predicates",
-                            "Unifies SOLUTIONS with a list of every value of TEMPLATE for every possible solution of GOAL.  Finds at most N solutiosn.",
-                            "*n", "=template", ":goal", "-solutions");
+                "Unifies SOLUTIONS with a list of every value of TEMPLATE for every possible solution of GOAL.  Finds at most N solutiosn.",
+                "*n", "=template", ":goal", "-solutions");
             DefinePrimitive("all", AllImplementation, "all solutions predicates",
-                            "Unifies SOLUTIONS with a list of every unique value of TEMPLATE for every possible solution of GOAL.",
-                            "=template", ":goal", "-solutions");
+                "Unifies SOLUTIONS with a list of every unique value of TEMPLATE for every possible solution of GOAL.",
+                "=template", ":goal", "-solutions");
             DefinePrimitive("sumall", SumallImplementation, "all solutions predicates",
-                            "Unifies SUM with sum of the values of NUMBERVAR in every possible solution of GOAL.",
-                            "-numberVar", ":goal", "-sum");
+                "Unifies SUM with sum of the values of NUMBERVAR in every possible solution of GOAL.",
+                "-numberVar", ":goal", "-sum");
             DefinePrimitive("arg_min", ArgMinImplementation, "all solutions predicates",
-                            "Find the value of TEMPLATE that gives the lowest SCORE among all solutions to GOAL.",
-                            ">template", "-score", "+goal");
+                "Find the value of TEMPLATE that gives the lowest SCORE among all solutions to GOAL.",
+                ">template", "-score", "+goal");
             DefinePrimitive("arg_max", ArgMaxImplementation, "all solutions predicates",
-                            "Find the value of TEMPLATE that gives the highest SCORE among all solutions to GOAL.",
-                            ">template", "-score", "+goal");
+                "Find the value of TEMPLATE that gives the highest SCORE among all solutions to GOAL.",
+                ">template", "-score", "+goal");
             DefinePrimitive("property", PropertyImplementation, ".net interoperation",
-                            "Unifies VALUE with the value of OBJECT's property named PROPERTY_NAME.Always succeeds exactly once (unless it throws an exception).",
-                            "*object", "*property_name", ">value");
+                "Unifies VALUE with the value of OBJECT's property named PROPERTY_NAME.Always succeeds exactly once (unless it throws an exception).",
+                "*object", "*property_name", ">value");
             DefinePrimitive("set_property", SetPropertyImplementation, ".net interoperation",
-                            "Sets OBJECT's property named PROPERTY_NAME to NEW_VALUE.  Always succeeds exactly once (unless it throws an exception).",
-                            "*object", "*property_name", "*new_value");
+                "Sets OBJECT's property named PROPERTY_NAME to NEW_VALUE.  Always succeeds exactly once (unless it throws an exception).",
+                "*object", "*property_name", "*new_value");
             DefinePrimitive("call_method", CallMethodImplementation, ".net interoperation",
-                            "Calls the specified method on OBJECT with the specified arguments and unifies RESULT with its return value.  Always succeeds exactly once (unless it throws an exception).",
-                            "*object", "*method_and_args", ">result");
+                "Calls the specified method on OBJECT with the specified arguments and unifies RESULT with its return value.  Always succeeds exactly once (unless it throws an exception).",
+                "*object", "*method_and_args", ">result");
             DefinePrimitive("is_class", IsClassImplementation, ".net interoperation",
-                            "True if OBJECT is of the specified CLASS.  If CLASS is a subclass of TwigGameComponent and OBJECT is uninstantiated, then it will enumerate objects if the specified type.",
-                            "?object", "?class");
-            DefinePrimitive("component_of_gameobject_with_type", ComponentOfGameObjectWithTypeImplementation, ".net interoperation",
-                            "True if component is a component of gameobject with type class.",
-                            "?component", "?gameobject", "+class");
+                "True if OBJECT is of the specified CLASS.  If CLASS is a subclass of TwigGameComponent and OBJECT is uninstantiated, then it will enumerate objects if the specified type.",
+                "?object", "?class");
+#if DeprecatedPrimitives
+            DefinePrimitive("component_of_gameobject_with_type", ComponentOfGameObjectWithTypeImplementation,
+                ".net interoperation",
+                "True if component is a component of gameobject with type class.",
+                "?component", "?gameobject", "+class");
+#endif
+            DefinePrimitive("has_component", HasComponentImplementation,
+                ".net interoperation",
+                "True if component is a component of gameobject with type class.",
+                "?gameobject", "?component", "+class");
             DefinePrimitive("parent_of_gameobject", ParentOfGameObjectImplementation, ".net interoperation",
-                            "True if CHILD is a child of PARENT in the game's rendering hierarchy.",
-                            "?child", "?parent");
+                "True if CHILD is a child of PARENT in the game's rendering hierarchy.",
+                "?child", "?parent");
             DefinePrimitive("discontiguous", (args1, context1) => CutStateSequencer.Succeed(), "declarations",
-                            "Declares that the specified predicate is allowed to be scattered through a file.  Currently unused but provided for compatibility with other Prolog implementation.",
-                            ":predicateIndicator", "..."); // noop
+                "Declares that the specified predicate is allowed to be scattered through a file.  Currently unused but provided for compatibility with other Prolog implementation.",
+                ":predicateIndicator", "..."); // noop
             DefinePrimitive("multifile", (args2, context2) => CutStateSequencer.Succeed(), "declarations",
-                            "Declares that the specified predicate is allowed to be scattered through multiple files.  Currently unused but provided for compatibility with other Prolog implementation.",
-                            ":predicateIndicator", "..."); // noop
-            DefinePrimitive("dynamic", MakeDeclarationPredicate( (p, context) => context.KnowledgeBase.DeclareExternal(p)),
-                            "declarations",
-                            "Declares that the specified predicate is allowed be dynamically modified using assert.  Currently unused but provided for compatibility with other Prolog implementation.",
-                            ":predicateIndicator", "..."); // noop
+                "Declares that the specified predicate is allowed to be scattered through multiple files.  Currently unused but provided for compatibility with other Prolog implementation.",
+                ":predicateIndicator", "..."); // noop
+            DefinePrimitive("dynamic",
+                MakeDeclarationPredicate((p, context) => context.KnowledgeBase.DeclareExternal(p)),
+                "declarations",
+                "Declares that the specified predicate is allowed be dynamically modified using assert.  Currently unused but provided for compatibility with other Prolog implementation.",
+                ":predicateIndicator", "..."); // noop
             DefinePrimitive("trace", TraceImplementation,
-                            "flow control,declarations",
-                            "Declares that the specified predicate should be traced when executing.",
-                            ":predicateIndicator", "...");
+                "flow control,declarations",
+                "Declares that the specified predicate should be traced when executing.",
+                ":predicateIndicator", "...");
             DefinePrimitive("notrace", NoTraceImplementation,
-                            "flow control,declarations",
-                            "Declares that the specified predicate should be traced when executing.",
-                            ":predicateIndicator", "...");
+                "flow control,declarations",
+                "Declares that the specified predicate should be traced when executing.",
+                ":predicateIndicator", "...");
             DefinePrimitive("pause_game", PauseImplementation,
-                            "flow control",
-                            "Pauses the game, leaving GUI, etc. running.",
-                            ":predicateIndicator", "...");
+                "flow control",
+                "Pauses the game, leaving GUI, etc. running.",
+                ":predicateIndicator", "...");
             DefinePrimitive("unpause_game",
-                            UnpauseImplementation,
-                            "flow control",
-                            "Restores normal flow of time in game.",
-                            ":predicateIndicator", "...");
-            DefinePrimitive("set_prolog_flag", SetPrologFlagImplementation, "declarations", "Sets/gets value of the specified control parameter for the prolog system.",
-                            "*flag", "?value");
+                UnpauseImplementation,
+                "flow control",
+                "Restores normal flow of time in game.",
+                ":predicateIndicator", "...");
+            DefinePrimitive("set_prolog_flag", SetPrologFlagImplementation, "declarations",
+                "Sets/gets value of the specified control parameter for the prolog system.",
+                "*flag", "?value");
             DefinePrimitive("check", CheckImplementation, "other predicates",
-                            "Checks that Goal is true, and throws an exception if it fails.  Only succeeds once, so similar to once/1.",
-                            ":goal");
+                "Checks that Goal is true, and throws an exception if it fails.  Only succeeds once, so similar to once/1.",
+                ":goal");
             DefinePrimitive(Symbol.Cut, CutImplementation, "flow control,meta-logical predicates",
-                            "Prohibits backtracking past this point for the current goal.");
+                "Prohibits backtracking past this point for the current goal.");
             DefinePrimitive(Symbol.Fail, ((args, context) => FailImplementation), "flow control",
-                            "Forces failure of the current goal.");
+                "Forces failure of the current goal.");
             DefinePrimitive("true", (args3, context3) => CutStateSequencer.Succeed(), "flow control", "Always succeeds.");
-            DefinePrimitive("repeat", RepeatImplementation, "flow control", "Always succeeds, and allows infinite backtracking.");
+            DefinePrimitive("repeat", RepeatImplementation, "flow control",
+                "Always succeeds, and allows infinite backtracking.");
             DefinePrimitive("throw", ThrowImplementation, "flow control,meta-logical predicates",
-                            "Throws the specified exception.",
-                            "+exception"); 
+                "Throws the specified exception.",
+                "+exception");
             DefinePrimitive("catch", CatchImplementation, "flow control,meta-logical predicates",
-                            "Attempts to prove the specified GOAL, catching exceptions.  If an exception is thrown, it is unified with EXCEPTION and RECOVER is run.",
-                            ":goal", "=exception", ":recover");
+                "Attempts to prove the specified GOAL, catching exceptions.  If an exception is thrown, it is unified with EXCEPTION and RECOVER is run.",
+                ":goal", "=exception", ":recover");
             DefinePrimitive("is", IsImplementation, "arithmetic",
-                            "Computes the value of FUNCTIONAL_EXPRESSION and unifies it with VARIABLE.  Expression must be fully instantiated, i.e. all variables in it must already have values.",
-                            ">variable", "*functional_expression");
+                "Computes the value of FUNCTIONAL_EXPRESSION and unifies it with VARIABLE.  Expression must be fully instantiated, i.e. all variables in it must already have values.",
+                ">variable", "*functional_expression");
             DefinePrimitive("=", EqualsImplementation, "comparisons", "Succeeds if the two terms are unifiable.", "?x",
-                            "?y");
+                "?y");
             DefinePrimitive("unifiable", UnifiableImplementation, "comparisons",
-                            "True if X and Y can be unified, but does not unify them.  Instead returns the most general unifier in UNIFIER.",
-                            "?x", "?y", "-unifier");
+                "True if X and Y can be unified, but does not unify them.  Instead returns the most general unifier in UNIFIER.",
+                "?x", "?y", "-unifier");
             DefinePrimitive("\\=", NotEqualsImplementation, "comparisons",
-                            "Succeeds if the two terms are not unifiable.", "?x", "?y");
-            DefinePrimitive("==", EquivalentImplementation, "comparisons", "Succeeds if the two terms are already identical, as opposed to =, which tries to make them identical through unification.", "?x",
-                            "?y");
-            DefinePrimitive("\\==", NotEquivalentImplementation, "comparisons", "Succeeds if the two terms are not identical, as opposed to \\= which tests if it's possible to make them identical through unification.", "?x",
-                            "?y");
+                "Succeeds if the two terms are not unifiable.", "?x", "?y");
+            DefinePrimitive("==", EquivalentImplementation, "comparisons",
+                "Succeeds if the two terms are already identical, as opposed to =, which tries to make them identical through unification.",
+                "?x",
+                "?y");
+            DefinePrimitive("\\==", NotEquivalentImplementation, "comparisons",
+                "Succeeds if the two terms are not identical, as opposed to \\= which tests if it's possible to make them identical through unification.",
+                "?x",
+                "?y");
             DefinePrimitive("copy_term", CopyTermImplementation, "term manipulation",
-                            "Makes a new copy of ORIGINAL with fresh variables, and unifies it with COPY.", "=original", "-copy");
+                "Makes a new copy of ORIGINAL with fresh variables, and unifies it with COPY.", "=original", "-copy");
             DefinePrimitive("=..", UnivImplementation, "term manipulation,list predicates",
-                            "If TERM is instantiated, explodes it into a list: [Functor | Arguments] and unifies it with LIST; if TERM uninstantiated, converts LIST to a term and unifies it with TERM.",
-                            "?term", "?list");
+                "If TERM is instantiated, explodes it into a list: [Functor | Arguments] and unifies it with LIST; if TERM uninstantiated, converts LIST to a term and unifies it with TERM.",
+                "?term", "?list");
             DefinePrimitive("functor", FunctorImplementation, "term manipulation",
-                            "True if TERM has the specified FUNCTOR and ARITY.",
-                            "?term", "?functor", "?arity");
-            DefinePrimitive("arg", ArgImplementation, "term manipulation", "True if argument number ARG (counting from 1, not zero) of STRUCTURE is TERM.",
-                            "*arg", "+structure", "?argumentValue");
+                "True if TERM has the specified FUNCTOR and ARITY.",
+                "?term", "?functor", "?arity");
+            DefinePrimitive("arg", ArgImplementation, "term manipulation",
+                "True if argument number ARG (counting from 1, not zero) of STRUCTURE is TERM.",
+                "*arg", "+structure", "?argumentValue");
             DefinePrimitive("list", ListImplementation, "list predicates", "True if X is a list.", "?x");
             DefinePrimitive("length", LengthImplementation, "list predicates",
-                            "Unifies LENGTH with the length of LIST.  This is a true relation, so if LIST is uninstantiated, it will create lists with specified lengths.",
-                            "?list", "?length");
+                "Unifies LENGTH with the length of LIST.  This is a true relation, so if LIST is uninstantiated, it will create lists with specified lengths.",
+                "?list", "?length");
             DefinePrimitive("member", MemberImplementation, "list predicates",
-                            "True if ELEMENT is an element of LIST.  This is a true relation, so if necessary, it will create new LISTS.",
-                            "?element", "?list");
+                "True if ELEMENT is an element of LIST.  This is a true relation, so if necessary, it will create new LISTS.",
+                "?element", "?list");
             DefinePrimitive("memberchk", MemberChkImplementation, "list predicates",
-                            "True if ELEMENT is an element of LIST, but will not backtrack different choices of the element.  This is a true relation, so if necessary, it will create new LISTS.",
-                            "?element", "?list");
+                "True if ELEMENT is an element of LIST, but will not backtrack different choices of the element.  This is a true relation, so if necessary, it will create new LISTS.",
+                "?element", "?list");
             DefinePrimitive("random_member", RandomMemberImplementation, "list predicates",
-                            "Unifies ELEMENT with elements of LIST in random order.",
-                            "?element", "+list");
+                "Unifies ELEMENT with elements of LIST in random order.",
+                "?element", "+list");
             DefinePrimitive("append", AppendImplementation, "list predicates",
-                            "True if JOINED is a list that starts with the elements of START and is followed by the elements of END.  This is a true relation, so it can be used to compute any argument from the others.",
-                            "?start", "?end", "?joined");
+                "True if JOINED is a list that starts with the elements of START and is followed by the elements of END.  This is a true relation, so it can be used to compute any argument from the others.",
+                "?start", "?end", "?joined");
             DefinePrimitive("reverse", ReverseImplementation, "list predicates",
-                            "True if the lists FORWARD and BACKWARD are reversed versions of one another.",
-                            "?forward", "?backward");
+                "True if the lists FORWARD and BACKWARD are reversed versions of one another.",
+                "?forward", "?backward");
             DefinePrimitive("flatten", FlattenImplementation, "list predicates",
-                            "True if FLATLIST contains all the atoms of LISTOFLISTS, in order.",
-                            "+listoflists", "?flatlist");
+                "True if FLATLIST contains all the atoms of LISTOFLISTS, in order.",
+                "+listoflists", "?flatlist");
             DefinePrimitive("prefix", PrefixImplementation, "list predicates", "True if LIST starts with PREFIX.",
-                            "?prefix", "?list");
+                "?prefix", "?list");
             DefinePrimitive("suffix", SuffixImplementation, "list predicates", "True if LIST ends with SUFFIX.",
-                            "?suffix", "?list");
+                "?suffix", "?list");
             DefinePrimitive("select", SelectImplementation, "list predicates",
-                            "True if X is an element of LIST_WITH and LIST_WITHOUT is LIST_WITH minus an occurance of X.",
-                            "?x", "?list_with", "?list_without");
+                "True if X is an element of LIST_WITH and LIST_WITHOUT is LIST_WITH minus an occurance of X.",
+                "?x", "?list_with", "?list_without");
             DefinePrimitive("delete", DeleteImplementation, "list predicates", "True if HasNoXs is LIST without X.",
-                            "?list", "?x", "?HasNoXs");
+                "?list", "?x", "?HasNoXs");
             DefinePrimitive("msort", MSortImplementation, "list predicates",
                 "True if RESULT is unifiable with a sorted version of LIST.  Does not remove duplicates.",
                 "+list", "-result");
@@ -308,155 +327,173 @@ namespace Prolog
                 "LIST should be of the format [KEY-VALUE, ...].  True if RESULT is unifiable with a version of LIST sorted by its KEYs.  Does not remove duplicates.",
                 "+list", "-result");
             DefinePrimitive("<", MakeComparisonPredicate("<", (a, b) => a < b), "comparisons",
-                            "True if number X is less than Y.  Both must be ground.", "*x", "*y");
+                "True if number X is less than Y.  Both must be ground.", "*x", "*y");
             DefinePrimitive(">", MakeComparisonPredicate(">", (a, b) => a > b), "comparisons",
-                            "True if number X is greater than Y.  Both must be ground.", "*x", "*y");
+                "True if number X is greater than Y.  Both must be ground.", "*x", "*y");
             DefinePrimitive("=<", MakeComparisonPredicate("<=", (a, b) => a <= b), "comparisons",
-                            "True if number X is less than or equal to Y.  Both must be ground.", "*x", "*y");
+                "True if number X is less than or equal to Y.  Both must be ground.", "*x", "*y");
             DefinePrimitive(">=", MakeComparisonPredicate(">=", (a, b) => a >= b), "comparisons",
-                            "True if number X is greater than or equal to Y.  Both must be ground.", "*x", "*y");
+                "True if number X is greater than or equal to Y.  Both must be ground.", "*x", "*y");
             DefinePrimitive("@<", MakeTermComparisonPredicate("@<", a => a < 0), "comparisons",
-                "True if term X is less than Y given Prolog's ordering on terms.  X and Y need not be numbers.", "?x", "?y");
+                "True if term X is less than Y given Prolog's ordering on terms.  X and Y need not be numbers.", "?x",
+                "?y");
             DefinePrimitive("@>", MakeTermComparisonPredicate("@>", a => a > 0), "comparisons",
-                            "True if term X is greater than Y given Prolog's ordering on terms.  X and Y need not be numbers.", "?x", "?y");
+                "True if term X is greater than Y given Prolog's ordering on terms.  X and Y need not be numbers.", "?x",
+                "?y");
             DefinePrimitive("@=<", MakeTermComparisonPredicate("@<=", a => a <= 0), "comparisons",
-                            "True if term X is less than or equal to Y given Prolog's ordering on terms.  X and Y need not be numbers.", "?x", "?y");
+                "True if term X is less than or equal to Y given Prolog's ordering on terms.  X and Y need not be numbers.",
+                "?x", "?y");
             DefinePrimitive("@>=", MakeTermComparisonPredicate("@>=", a => a >= 0), "comparisons",
-                            "True if term X is greater than or equal to Y given Prolog's ordering on terms.  X and Y need not be numbers.", "?x", "?y");
+                "True if term X is greater than or equal to Y given Prolog's ordering on terms.  X and Y need not be numbers.",
+                "?x", "?y");
 
             // ReSharper disable CompareOfFloatsByEqualityOperator
-            DefinePrimitive("=\\=", MakeComparisonPredicate("=\\=", (a, b) => a != b), "comparisons",
-                            "True if X and Y are different numbers.  Both must be ground.", "*x", "*y");
+            DefinePrimitive("=\\=", MakeGeneralComparisonPredicate("=\\=", (a, b) => !Equals(a, b)), "comparisons",
+                "True if X and Y are different numbers.  Both must be ground.", "*x", "*y");
             // ReSharper restore CompareOfFloatsByEqualityOperator
             // ReSharper disable CompareOfFloatsByEqualityOperator
-            DefinePrimitive("=:=", MakeComparisonPredicate("=:=", (a, b) => a == b), "comparisons",
-                            "True if functional expressions X and Y have the same values.  Both must be ground.",
-                            "*x", "*y");
+            DefinePrimitive("=:=", MakeGeneralComparisonPredicate("=:=", (a, b) => Equals(a, b)), "comparisons",
+                "True if functional expressions X and Y have the same values.  Both must be ground.",
+                "*x", "*y");
             // ReSharper restore CompareOfFloatsByEqualityOperator
             DefinePrimitive("C", CPrimitiveImplementation, "definite clause grammars",
-                            "Used in implementation of DGCs.  True if LIST starts with WORD and continues with TAIL.",
-                            "?list", "?word", "?tail");
+                "Used in implementation of DGCs.  True if LIST starts with WORD and continues with TAIL.",
+                "?list", "?word", "?tail");
             DefinePrimitive("var", MakeNullFailingTypePredicate("var", (x => (x is LogicVariable))),
-                            "meta-logical predicates", "True if X is an uninstantiated variable.", "?x");
-                // ReSharper disable once RedundantComparisonWithNull
-            DefinePrimitive("nonvar", MakeNullTestingTypePredicate("nonvar", (x => x==null || !(x is LogicVariable))),
-                            "meta-logical predicates",
-                            "True if X isn't an uninstantiated variable, that is, if it's instantiated to some term.",
-                            "?x");
+                "meta-logical predicates", "True if X is an uninstantiated variable.", "?x");
+            // ReSharper disable once RedundantComparisonWithNull
+            DefinePrimitive("nonvar", MakeNullTestingTypePredicate("nonvar", (x => x == null || !(x is LogicVariable))),
+                "meta-logical predicates",
+                "True if X isn't an uninstantiated variable, that is, if it's instantiated to some term.",
+                "?x");
             DefinePrimitive("ground", MakeNullTestingTypePredicate("var", (Term.IsGround)),
-                            "meta-logical predicates", "True if X is a ground term, i.e. contains no unbound variables.", "?x");
-            DefinePrimitive("number", MakeNullFailingTypePredicate("number", (x => (x is float) || (x is int))), "type predicates",
-                            "True if X is a number.", "?x");
+                "meta-logical predicates", "True if X is a ground term, i.e. contains no unbound variables.", "?x");
+            DefinePrimitive("number", MakeNullFailingTypePredicate("number", (x => (x is float) || (x is int))),
+                "type predicates",
+                "True if X is a number.", "?x");
             DefinePrimitive("integer", MakeNullFailingTypePredicate("integer", (x => (x is int))), "type predicates",
-                            "True if X is an integer.", "?x");
+                "True if X is an integer.", "?x");
             DefinePrimitive("float", MakeNullFailingTypePredicate("float", (x => ((x is float) || (x is double)))),
-                            "type predicates", "True if X is a floating-point number.", "?x");
-                // ReSharper disable once RedundantComparisonWithNull
+                "type predicates", "True if X is a floating-point number.", "?x");
+            // ReSharper disable once RedundantComparisonWithNull
             DefinePrimitive("atomic", MakeNullTestingTypePredicate("atomic", (x => x == null || !(x is Structure))),
-                            "type predicates", "True if X is not a structured term, i.e. it's a number, symbol, etc..",
-                            "?x");
+                "type predicates", "True if X is not a structured term, i.e. it's a number, symbol, etc..",
+                "?x");
             DefinePrimitive("string", MakeNullFailingTypePredicate("string", (x => (x is string))), "type predicates",
-                            "True if X is a string.", "?x");
-            DefinePrimitive("atom", MakeNullTestingTypePredicate("atom", (x => (x == null) || (x is Symbol))), "type predicates",
-                            "True if X is a symbol.", "?x");
+                "True if X is a string.", "?x");
+            DefinePrimitive("atom", MakeNullTestingTypePredicate("atom", (x => (x == null) || (x is Symbol))),
+                "type predicates",
+                "True if X is a symbol.", "?x");
             DefinePrimitive("symbol", MakeNullFailingTypePredicate("symbol", (x => (x is Symbol))), "type predicates",
-                            "True if X is a symbol.", "?x");
+                "True if X is a symbol.", "?x");
             DefinePrimitive("compound", MakeNullFailingTypePredicate("compound", (x => (x is Structure))),
-                            "type predicates", "True if X is a structured term or list.", "?x");
+                "type predicates", "True if X is a structured term or list.", "?x");
             DefinePrimitive("consult", ConsultImplementation, "loading code",
-                            "Reads the clauses in FILE and addds them to the database.", "*file", "[kb]");
+                "Reads the clauses in FILE and addds them to the database.", "*file", "[kb]");
             DefinePrimitive("reconsult", ReconsultImplementation, "loading code",
-                            "Removes all clauses previously loaded from FILE, then reads the clauses in FILE and addds them to the database.",
-                            "*file");
-            DefinePrimitive("listing", ListingImplementation, "loading code,database manipulation", "Prints a listing of PREDICATE", "*predicate");
-            DefinePrimitive("asserta", AssertaImplementation, "database manipulation", "Adds TERM (a rule or fact) to the database as the first clause for the predicate.", "+term");
+                "Removes all clauses previously loaded from FILE, then reads the clauses in FILE and addds them to the database.",
+                "*file");
+            DefinePrimitive("listing", ListingImplementation, "loading code,database manipulation",
+                "Prints a listing of PREDICATE", "*predicate");
+            DefinePrimitive("asserta", AssertaImplementation, "database manipulation",
+                "Adds TERM (a rule or fact) to the database as the first clause for the predicate.", "+term");
             DefinePrimitive("assertz", AssertzImplementation, "database manipulation",
-                            "Adds TERM (a rule or fact) to the database as the last clause for the predicate.", "+term");
+                "Adds TERM (a rule or fact) to the database as the last clause for the predicate.", "+term");
             DefinePrimitive("assert", AssertzImplementation, "database manipulation",
-                            "Adds TERM (a rule or fact) to the database as the last clause for the predicate.  Same as assertz.", "+term");
-            DefinePrimitive("retractall", RetractAllImplementation, "database manipulation", "Removes all database entries whose heads unify with HEAD.", "+head");
-            DefinePrimitive("retract", RetractImplementation, "database manipulation", "Removes first database entry that unifies with TERM.", "+term");
-            DefinePrimitive("clause", ClauseImplementation, "database manipulation", "Unifies HEAD and BODY with entries in the database.", "+head", "?body");
+                "Adds TERM (a rule or fact) to the database as the last clause for the predicate.  Same as assertz.",
+                "+term");
+            DefinePrimitive("retractall", RetractAllImplementation, "database manipulation",
+                "Removes all database entries whose heads unify with HEAD.", "+head");
+            DefinePrimitive("retract", RetractImplementation, "database manipulation",
+                "Removes first database entry that unifies with TERM.", "+term");
+            DefinePrimitive("clause", ClauseImplementation, "database manipulation",
+                "Unifies HEAD and BODY with entries in the database.", "+head", "?body");
             DefinePrimitive("step_limit", StepLimitImplementation, "other predicates",
-                            "Gets/sets the maximum number of inference steps allowed.", "*maximum_steps");
+                "Gets/sets the maximum number of inference steps allowed.", "*maximum_steps");
             DefinePrimitive("call_with_step_limit", CallWithStepLimitImplementation, "other predicates",
-                            "Runs GOAL, using at most MAXIMUM_STEPS.", "*maximum_steps", ":Goal");
+                "Runs GOAL, using at most MAXIMUM_STEPS.", "*maximum_steps", ":Goal");
             DefinePrimitive("benchmark", BenchmarkImplementation, "other predicates",
-                            "Runs GOAL repeatedly, COUNT times.", "+goal", "*count");
+                "Runs GOAL repeatedly, COUNT times.", "+goal", "*count");
             DefinePrimitive("word_list", WordListImplementation, "definite clause grammars",
-                            "Parses/unparses STRING into a LIST of word.", "?string", "?list");
+                "Parses/unparses STRING into a LIST of word.", "?string", "?list");
             DefinePrimitive("register_lexical_item", RegisterLexicalItemImplementation, "definite clause grammars",
-                            "Adds WORD to list of words recognized by word_list.", "+word");
+                "Adds WORD to list of words recognized by word_list.", "+word");
             DefinePrimitive("string_representation", StringRepresentationImplementation, "other predicates",
-                            "Parses/unparses between TERM and STRING.", "?term", "?string");
+                "Parses/unparses between TERM and STRING.", "?term", "?string");
             DefinePrimitive("starts_with", StartsWithImplementation, "other predicates",
-                            "The string or symbol's name begins with the specified substring.", "*substring", "*string_or_symbol");
+                "The string or symbol's name begins with the specified substring.", "*substring", "*string_or_symbol");
             DefinePrimitive("ends_with", EndsWithImplementation, "other predicates",
-                            "The string or symbol's name end with the specified substring.", "*substring", "*string_or_symbol");
+                "The string or symbol's name end with the specified substring.", "*substring", "*string_or_symbol");
             DefinePrimitive("starts_with_one_of", StartsWithOneOfImplementation, "other predicates",
-                            "The string or symbol's name begins with one of the characters in the specified string.", "*possible_first_chars_string", "*string_or_symbol");
+                "The string or symbol's name begins with one of the characters in the specified string.",
+                "*possible_first_chars_string", "*string_or_symbol");
             DefinePrimitive("contains_substring", ContainsSubstringImplementation, "other predicates",
-                            "The string or symbol's name contains the specified string.", "*substring", "*string_or_symbol");
+                "The string or symbol's name contains the specified string.", "*substring", "*string_or_symbol");
             DefinePrimitive("plural_form", PluralFormImplementation, "other predicates",
-                            "String plural is the plural form of string singular, using the default rules for English plurals.", "*singular", "?plural");
+                "String plural is the plural form of string singular, using the default rules for English plurals.",
+                "*singular", "?plural");
             DefinePrimitive("atom_string", AtomStringImplementation, "other predicates",
-                            "Atom has the same print name as string.", "?atom", "?string");
+                "Atom has the same print name as string.", "?atom", "?string");
             DefinePrimitive("game_object_name", GameObjectNameImplementation, "other predicates",
-                            "True when name_symbol is the name of game_object.", "?game_object", "?name_symbol");
+                "True when name_symbol is the name of game_object.", "?game_object", "?name_symbol");
             DefinePrimitive("set", KnowledgeBaseVariable.SetImplementation, "other predicates,meta-logical predicates",
-                            "Forcibly asserts PREDICATE(VALUE) and retracts all other clauses for PREDICATE.",
-                            "*predicate", "*value");
+                "Forcibly asserts PREDICATE(VALUE) and retracts all other clauses for PREDICATE.",
+                "*predicate", "*value");
             DefinePrimitive("display", DisplayImplementation, "other predicates",
-                            "Prints arguments to the console; string arguments are not quoted.", "?argument", "...");
+                "Prints arguments to the console; string arguments are not quoted.", "?argument", "...");
             DefinePrimitive("displayln", DisplayLnImplementation, "other predicates",
-                            "Prints arguments to the console; string arguments are not quoted.", "?argument", "...");
+                "Prints arguments to the console; string arguments are not quoted.", "?argument", "...");
             DefinePrimitive("write", WriteImplementation, "other predicates",
-                            "Prints the value of OBJECT to the console.", "?objectOrStream", "[+Object]");
+                "Prints the value of OBJECT to the console.", "?objectOrStream", "[+Object]");
             DefinePrimitive("writeln", WritelnImplementation, "other predicates",
-                            "Prints the value of OBJECT to the console, along with a newline.", "?objectOrStream", "[+Object]");
+                "Prints the value of OBJECT to the console, along with a newline.", "?objectOrStream", "[+Object]");
             DefinePrimitive("nl", NLImplementation, "other predicates", "Prints a newline to the system console.");
             DefinePrimitive("log", LogImplementation, "other predicates", "Prints TERMS as a line in the Unity console.",
                 "?Term", "...");
-            DefinePrimitive("log_warning", LogWarningImplementation, "other predicates", "Prints TERMS as a line in the Unity console.",
+            DefinePrimitive("log_warning", LogWarningImplementation, "other predicates",
+                "Prints TERMS as a line in the Unity console.",
                 "?Term", "...");
-            DefinePrimitive("log_error", LogErrorImplementation, "other predicates", "Prints TERMS as a line in the Unity console.",
+            DefinePrimitive("log_error", LogErrorImplementation, "other predicates",
+                "Prints TERMS as a line in the Unity console.",
                 "?Term", "...");
-            DefinePrimitive("break", BreakImplementation, "flow control", "Pauses game within the Unity editor and prints TERMS as a line in the unity console.",
+            DefinePrimitive("break", BreakImplementation, "flow control",
+                "Pauses game within the Unity editor and prints TERMS as a line in the unity console.",
                 "?Term", "...");
-            DefinePrimitive("break_cs", BreakCSharpImplementation, "flow control", "Breakpoints the Prolog interpreter itself.");
+            DefinePrimitive("break_cs", BreakCSharpImplementation, "flow control",
+                "Breakpoints the Prolog interpreter itself.");
             DefinePrimitive("op", DeclareOperator, "declarations",
-                            "Declares the type and priority of an infix, prefix, or postfix operator.",
-                            "*priority", "*type", "*operator");
+                "Declares the type and priority of an infix, prefix, or postfix operator.",
+                "*priority", "*type", "*operator");
             DefinePrimitive("open", OpenImplementation, "other predicates", "Opens a file for input or output.",
-                            "*path", "*mode", "-stream");
+                "*path", "*mode", "-stream");
             DefinePrimitive("close", CloseImplementation, "other predicates", "Closes an open file.", "*stream");
             DefinePrimitive("read", ReadImplementation, "other predicates", "Reads an expression from an open stream.",
-                            "*stream", "-term");
+                "*stream", "-term");
             DefinePrimitive("shell", ShellImplementation, "other predicates",
-                            "Runs a shell command; disabled outside of editor builds.",
-                            "command", "arg_string");
+                "Runs a shell command; disabled outside of editor builds.",
+                "command", "arg_string");
             DefinePrimitive(ELProlog.NonExclusiveOperator, ELNonExclusiveQueryImplementation, "eremic logic",
-                            "Succeeds if expression can be matched against the EL knowledgebase.",
-                            "parent", "key");
+                "Succeeds if expression can be matched against the EL knowledgebase.",
+                "parent", "key");
             DefinePrimitive(ELProlog.ExclusiveOperator, ELExclusiveQueryImplementation, "eremic logic",
-                            "Succeeds if expression can be matched against the EL knowledgebase.",
-                            "parent", "key");
+                "Succeeds if expression can be matched against the EL knowledgebase.",
+                "parent", "key");
             DefinePrimitive(">>", ELNodeQueryImplementation, "eremic logic",
-                            "Binds VARIABLE to the subtree of the EL KB matching EXPRESSION.",
-                            "*expression", "-variable");
+                "Binds VARIABLE to the subtree of the EL KB matching EXPRESSION.",
+                "*expression", "-variable");
         }
 
-        #region Primitive table
+#region Primitive table
 
         private static void DefinePrimitive(string name, PrimitiveImplementation implementationDelegate,
-                                            string manualSections, string docstring, params object[] arglist)
+            string manualSections, string docstring, params object[] arglist)
         {
             Symbol s = Symbol.Intern(name);
             DefinePrimitive(s, implementationDelegate, manualSections, docstring, arglist);
         }
 
         internal static void DefinePrimitive(Symbol name, PrimitiveImplementation implementationDelegate,
-                                            string manualSections, string docstring, params object[] arglist)
+            string manualSections, string docstring, params object[] arglist)
         {
             Implementations[name] = implementationDelegate;
             if (arglist.Length > 0 && (arglist[arglist.Length - 1] as string) == "...")
@@ -469,7 +506,7 @@ namespace Prolog
                 MinimumArity[name] = MaximumArity[name] = arglist.Length;
                 for (var i = arglist.Length - 1; i >= 0; i--)
                 {
-                    if (!((string)(arglist[i])).StartsWith("["))
+                    if (!((string) (arglist[i])).StartsWith("["))
                     {
                         // This is a non-optional parameter
                         MinimumArity[name] = i + 1;
@@ -500,10 +537,12 @@ namespace Prolog
         /// </summary>
         internal static readonly Dictionary<Symbol, PrimitiveImplementation> Implementations =
             new Dictionary<Symbol, PrimitiveImplementation>();
+
         /// <summary>
         /// The smallest arity this primitive can accept
         /// </summary>
-        internal static readonly Dictionary<Symbol,int> MinimumArity = new Dictionary<Symbol, int>();
+        internal static readonly Dictionary<Symbol, int> MinimumArity = new Dictionary<Symbol, int>();
+
         /// <summary>
         /// The largest it can accept.
         /// </summary>
@@ -519,9 +558,9 @@ namespace Prolog
                    && p.Arity >= min && p.Arity <= MaximumArity[p.Functor];
         }
 
-        #endregion
+#endregion
 
-        #region Primitive implementations
+#region Primitive implementations
 
         /// <summary>
         /// Internal implementation of Cut
@@ -540,17 +579,17 @@ namespace Prolog
                     yield break;
                 yield return CutState.Continue;
             }
-        } 
+        }
 
         private static readonly object[] NoArgs = new object[0];
 
         private static IEnumerable<CutState> BeginImplementation(object[] args, PrologContext context)
         {
             var enumerators = new IEnumerator<CutState>[args.Length];
-            int i=0;
+            int i = 0;
             try
             {
-                for (; i<args.Length; i++)
+                for (; i < args.Length; i++)
                 {
                     var goal = args[i];
                     var goalStructure = Term.Structurify(goal, "Argument to begin is not a valid goal.");
@@ -568,7 +607,7 @@ namespace Prolog
             }
             finally
             {
-                while ((--i)>=0)
+                while ((--i) >= 0)
                     enumerators[i].Dispose();
             }
         }
@@ -578,7 +617,7 @@ namespace Prolog
             if (args.Length != 2)
                 throw new ArgumentCountException("method calll", args, "*object", "method(*arguments, ...)");
             var result = FunctionalExpression.EvalMemberExpression(args[0], args[1], context);
-            return CutStateSequencer.FromBoolean(!(result is bool) || ((bool)result));
+            return CutStateSequencer.FromBoolean(!(result is bool) || ((bool) result));
         }
 
         private static IEnumerable<CutState> ModuleCallImplementation(object[] args, PrologContext context)
@@ -603,7 +642,7 @@ namespace Prolog
                     }
                     else
                     {
-                        throw new ArgumentTypeException("::", "module", module, typeof(GameObject));
+                        throw new ArgumentTypeException("::", "module", module, typeof (GameObject));
                     }
                 }
             }
@@ -640,28 +679,29 @@ namespace Prolog
 
                 default:
                     // More than 1 argument - add other arguments to the end of the predicate
+                {
+                    object goal = Term.Deref(args[0]);
+                    var t = goal as Structure;
+
+                    if (t != null)
                     {
-                        object goal = Term.Deref(args[0]);
-                        var t = goal as Structure;
+                        var goalArgs = new object[t.Arguments.Length + args.Length - 1];
+                        t.Arguments.CopyTo(goalArgs, 0);
+                        Array.Copy(args, 1, goalArgs, t.Arguments.Length, args.Length - 1);
 
-                        if (t != null)
-                        {
-                            var goalArgs = new object[t.Arguments.Length + args.Length - 1];
-                            t.Arguments.CopyTo(goalArgs, 0);
-                            Array.Copy(args, 1, goalArgs, t.Arguments.Length, args.Length - 1);
-
-                            return IgnoreCuts(context.KnowledgeBase.Prove(t.Functor, goalArgs, context, context.CurrentFrame));
-                        }
-                        var s = goal as Symbol;
-                        if (s != null)
-                        {
-                            var goalArgs = new object[args.Length - 1];
-                            Array.Copy(args, 1, goalArgs, 0, args.Length - 1);
-
-                            return IgnoreCuts(context.KnowledgeBase.Prove(s, goalArgs, context, context.CurrentFrame));
-                        }
-                        throw new ArgumentException("Argument to call must be a valid subgoal.");
+                        return
+                            IgnoreCuts(context.KnowledgeBase.Prove(t.Functor, goalArgs, context, context.CurrentFrame));
                     }
+                    var s = goal as Symbol;
+                    if (s != null)
+                    {
+                        var goalArgs = new object[args.Length - 1];
+                        Array.Copy(args, 1, goalArgs, 0, args.Length - 1);
+
+                        return IgnoreCuts(context.KnowledgeBase.Prove(s, goalArgs, context, context.CurrentFrame));
+                    }
+                    throw new ArgumentException("Argument to call must be a valid subgoal.");
+                }
             }
         }
 
@@ -709,7 +749,10 @@ namespace Prolog
             Exception exception = null;
             Structure goal = Term.Structurify(args[0], "Goal argument must be a valid goal.");
             Structure recover = Term.Structurify(args[2], "Recover argument must be a valid goal.");
-            using (var prover = context.KnowledgeBase.Prove(goal.Functor, goal.Arguments, context, context.CurrentFrame).GetEnumerator())
+            using (
+                var prover =
+                    context.KnowledgeBase.Prove(goal.Functor, goal.Arguments, context, context.CurrentFrame)
+                        .GetEnumerator())
             {
                 bool alive = true;
                 while (alive)
@@ -742,12 +785,14 @@ namespace Prolog
                     {
                         var goalException = exception as GoalException;
                         if (goalException != null)
-                            isoexception = new Structure(Symbol.Intern("type_error"), Symbol.Intern("callable"), goalException.Goal);
+                            isoexception = new Structure(Symbol.Intern("type_error"), Symbol.Intern("callable"),
+                                goalException.Goal);
                         else
                         {
                             var procedureException = exception as BadProcedureException;
                             if (procedureException != null)
-                                isoexception = new Structure(Symbol.Intern("type_error"), Symbol.Intern("evaluable"), procedureException.Procedure);
+                                isoexception = new Structure(Symbol.Intern("type_error"), Symbol.Intern("evaluable"),
+                                    procedureException.Procedure);
                             else
                             {
                                 var prologException = exception as PrologException;
@@ -758,19 +803,20 @@ namespace Prolog
                                     var ate = exception as ArgumentTypeException;
                                     object type = ate.ExpectedType;
                                     // ReSharper disable RedundantCast
-                                    if (type == (object)typeof(int))
+                                    if (type == (object) typeof (int))
                                         type = Symbol.Intern("integer");
-                                    else if (type == (object)typeof(float) || type == (object)typeof(double))
+                                    else if (type == (object) typeof (float) || type == (object) typeof (double))
                                         type = Symbol.Intern("float");
-                                    else if (type == (object)typeof(Symbol))
+                                    else if (type == (object) typeof (Symbol))
                                         type = Symbol.Intern("atom");
-                                    else if (type == (object)typeof(Structure))
+                                    else if (type == (object) typeof (Structure))
                                         type = Symbol.Intern("compound");
                                     // ReSharper restore RedundantCast
                                     isoexception = new Structure(Symbol.Intern("type_error"), type, ate.Value);
                                 }
                                 else
-                                    isoexception = new Structure("clr_exception", Symbol.Intern(exception.GetType().Name), exception.Message);
+                                    isoexception = new Structure("clr_exception",
+                                        Symbol.Intern(exception.GetType().Name), exception.Message);
                             }
                         }
                     }
@@ -778,9 +824,12 @@ namespace Prolog
                 // ReSharper disable UnusedVariable
 #pragma warning disable 414, 168, 219
                 foreach (var ignore in Term.Unify(args[1], new Structure(Symbol.Intern("error"), isoexception, null)))
-                    foreach (var ignore2 in context.KnowledgeBase.Prove(recover.Functor, recover.Arguments, context, context.CurrentFrame))
+                    foreach (
+                        var ignore2 in
+                            context.KnowledgeBase.Prove(recover.Functor, recover.Arguments, context,
+                                context.CurrentFrame))
 #pragma warning restore 414, 168, 219
-                    // ReSharper restore UnusedVariable
+                        // ReSharper restore UnusedVariable
                     {
                         yield return CutState.Continue;
                         yield break;
@@ -843,7 +892,7 @@ namespace Prolog
             if (args.Length != 2) throw new ArgumentCountException(", (and)", args, "goal1", "goal2");
             foreach (var status1 in context.Prove(args[0], "Arguments to , (and) must be valid subgoals."))
             {
-                if (status1==CutState.ForceFail)
+                if (status1 == CutState.ForceFail)
                 {
                     yield return status1;
                     yield break;
@@ -861,6 +910,7 @@ namespace Prolog
         }
 
         readonly static Symbol IfSymbol = Symbol.Intern("->");
+
         private static IEnumerable<CutState> OrImplementation(object[] args, PrologContext context)
         {
             if (args.Length != 2) throw new ArgumentCountException("; (or)", args, "goal1", "goal2");
@@ -868,7 +918,7 @@ namespace Prolog
             if (first != null && first.IsFunctor(IfSymbol, 2))
                 // Kluge
                 return IfThenElseImplementation(first.Argument(0), first.Argument(1), Term.Deref(args[1]),
-                                                context);
+                    context);
             return RealOrImplementation(args, context);
         }
 
@@ -894,7 +944,8 @@ namespace Prolog
             }
         }
 
-        private static IEnumerable<CutState> IfThenElseImplementation(object test, object consequent, object alternative, PrologContext context)
+        private static IEnumerable<CutState> IfThenElseImplementation(object test, object consequent, object alternative,
+            PrologContext context)
         {
 #pragma warning disable 414, 168, 219
             // ReSharper disable UnusedVariable
@@ -929,7 +980,7 @@ namespace Prolog
             {
                 // ReSharper disable UnusedVariable
                 foreach (var ignore2 in context.Prove(args[1], "Arguments to -> must be valid subgoals."))
-                // ReSharper restore UnusedVariable
+                    // ReSharper restore UnusedVariable
 #pragma warning restore 414, 168, 219
                 {
                     yield return CutState.Continue;
@@ -943,7 +994,8 @@ namespace Prolog
             if (args.Length != 1) throw new ArgumentCountException("not", args, "goal");
             LogicVariable v = Term.FindUninstantiatedVariable(args[0]);
             if (v != null)
-                throw new InstantiationException(v, "Argument to not must be a ground literal (i.e. contain no unbound variables).");
+                throw new InstantiationException(v,
+                    "Argument to not must be a ground literal (i.e. contain no unbound variables).");
             using (var e = context.Prove(args[0], "Argument to not must be a valid term to prove.").GetEnumerator())
             {
                 if (!e.MoveNext() || e.Current == CutState.ForceFail)
@@ -980,7 +1032,7 @@ namespace Prolog
             if (args.Length != 1) throw new ArgumentCountException("ignore", args, "goal");
             using (var e = context.Prove(args[0], "Argument to ignore/n must be a valid subgoal.").GetEnumerator())
             {
-                e.MoveNext();  // Ignore whether it succeeded.
+                e.MoveNext(); // Ignore whether it succeeded.
                 yield return CutState.Continue;
             }
         }
@@ -1018,9 +1070,9 @@ namespace Prolog
         private static readonly Symbol SY = Symbol.Intern("Y");
         private static readonly Symbol SYt = Symbol.Intern("YT");
         // ReSharper restore InconsistentNaming
-        
+
         private static IEnumerable<CutState> MapListInternal(Symbol functor, object[] args, object list1, object list2,
-                                                             PrologContext context)
+            PrologContext context)
         {
             // maplist(_, [], []).
             // ReSharper disable UnusedVariable
@@ -1170,7 +1222,7 @@ namespace Prolog
         {
             if (args.Length != 3)
                 throw new ArgumentCountException("select", args, "element", "list_with_element",
-                                                 "list_without_element");
+                    "list_without_element");
             return SelectInternal(args[0], args[1], args[2]);
         }
 
@@ -1322,41 +1374,43 @@ namespace Prolog
         {
             if (args.Length != 3) throw new ArgumentCountException("findall", args, "template", "goal", "bag");
             return Term.UnifyAndReturnCutState(args[2],
-                                                Prolog.IListToPrologList(SolutionList(context,
-                                                                                      Term.Deref(args[0]), 
-                                                                                      Term.Deref(args[1]),
-                                                                                      int.MaxValue,
-                                                                                      false)));
+                Prolog.IListToPrologList(SolutionList(context,
+                    Term.Deref(args[0]),
+                    Term.Deref(args[1]),
+                    int.MaxValue,
+                    false)));
         }
 
         [SuppressMessage("Microsoft.Performance", "CA1804:RemoveUnusedLocals",
             MessageId = "ignore")]
         private static IEnumerable<CutState> FindNSolsImplementation(object[] args, PrologContext context)
         {
-            if (args.Length != 4) throw new ArgumentCountException("findnsols", args, "*max_solutions", "template", "goal", "bag");
+            if (args.Length != 4)
+                throw new ArgumentCountException("findnsols", args, "*max_solutions", "template", "goal", "bag");
             object countArg = Term.Deref(args[0]);
             if (!(countArg is int))
-                throw new ArgumentTypeException("findnsols", "max_solutions", countArg, typeof(int));
+                throw new ArgumentTypeException("findnsols", "max_solutions", countArg, typeof (int));
             return Term.UnifyAndReturnCutState(args[3],
-                                                Prolog.IListToPrologList(SolutionList(context,
-                                                                                      Term.Deref(args[1]),
-                                                                                      Term.Deref(args[2]),
-                                                                                      (int)countArg,
-                                                                                      false)));
+                Prolog.IListToPrologList(SolutionList(context,
+                    Term.Deref(args[1]),
+                    Term.Deref(args[2]),
+                    (int) countArg,
+                    false)));
         }
 
         private static IEnumerable<CutState> AllImplementation(object[] args, PrologContext context)
         {
             if (args.Length != 3) throw new ArgumentCountException("all", args, "template", "goal", "bag");
             return Term.UnifyAndReturnCutState(args[2],
-                                                Prolog.IListToPrologList(SolutionList(context,
-                                                                                      Term.Deref(args[0]),
-                                                                                      Term.Deref(args[1]),
-                                                                                      int.MaxValue,
-                                                                                      true)));
+                Prolog.IListToPrologList(SolutionList(context,
+                    Term.Deref(args[0]),
+                    Term.Deref(args[1]),
+                    int.MaxValue,
+                    true)));
         }
 
-        private static List<object> SolutionList(PrologContext context, object template, object goal, int maxSolutions, bool deleteDuplicates)
+        private static List<object> SolutionList(PrologContext context, object template, object goal, int maxSolutions,
+            bool deleteDuplicates)
         {
             var bag = new List<object>();
 #pragma warning disable 414, 168, 219
@@ -1380,13 +1434,13 @@ namespace Prolog
             if (args.Length != 3) throw new ArgumentCountException("sumall", args, "numberVar", "generator", "sum");
             var numberVar = Term.Deref(args[0]) as LogicVariable;
             if (numberVar == null)
-                throw new ArgumentTypeException("sumall", "numberVar", args[0], typeof(LogicVariable));
+                throw new ArgumentTypeException("sumall", "numberVar", args[0], typeof (LogicVariable));
             //object bag = null;
             double sum = 0;
 #pragma warning disable 414, 168, 219
             // ReSharper disable UnusedVariable
             foreach (var ignore in context.Prove(args[1], "goal argument to findall must be a valid Prolog goal."))
-            // ReSharper restore UnusedVariable
+                // ReSharper restore UnusedVariable
 #pragma warning restore 414, 168, 219
             {
                 sum += Convert.ToDouble(numberVar.Value);
@@ -1407,7 +1461,7 @@ namespace Prolog
 #pragma warning disable 414, 168, 219
             // ReSharper disable UnusedVariable
             foreach (var ignore in context.Prove(args[2], "Goal argument to arg_max must be a valid Prolog goal."))
-            // ReSharper restore UnusedVariable
+                // ReSharper restore UnusedVariable
 #pragma warning restore 414, 168, 219
             {
                 float newScore = Convert.ToSingle(Term.Deref(score));
@@ -1443,7 +1497,7 @@ namespace Prolog
 #pragma warning disable 414, 168, 219
             // ReSharper disable UnusedVariable
             foreach (var ignore in context.Prove(args[2], "Goal argument to arg_min must be a valid Prolog goal."))
-            // ReSharper restore UnusedVariable
+                // ReSharper restore UnusedVariable
 #pragma warning restore 414, 168, 219
             {
                 float newScore = Convert.ToSingle(Term.Deref(score));
@@ -1473,7 +1527,7 @@ namespace Prolog
             object objectArg = Term.Deref(args[0]);
             if (objectArg is LogicVariable)
                 throw new UninstantiatedVariableException((LogicVariable) args[0],
-                                                          "First argument of property/3 must be instantiated to an object from which to get the property value.");
+                    "First argument of property/3 must be instantiated to an object from which to get the property value.");
             object nameObject = Term.Deref(args[1]);
             var nameArg = nameObject as string;
             if (nameArg == null)
@@ -1486,7 +1540,7 @@ namespace Prolog
                         throw new ArgumentException(
                             "Second argument (the name of the property to get) must be a string or symbol.");
                     throw new UninstantiatedVariableException(l,
-                                                              "Second argument to property/3 must be instantiated to a string or symbol.");
+                        "Second argument to property/3 must be instantiated to a string or symbol.");
                 }
                 nameArg = s.Name;
             }
@@ -1502,7 +1556,7 @@ namespace Prolog
             object objectArg = Term.Deref(args[0]);
             if (objectArg is LogicVariable)
                 throw new UninstantiatedVariableException((LogicVariable) args[0],
-                                                          "First argument of property/3 must be instantiated to an object from which to get the property value.");
+                    "First argument of property/3 must be instantiated to an object from which to get the property value.");
             object nameObject = Term.Deref(args[1]);
             var nameArg = nameObject as string;
             if (nameArg == null)
@@ -1515,7 +1569,7 @@ namespace Prolog
                         throw new ArgumentException(
                             "Second argument (the name of the property to get) must be a string or symbol.");
                     throw new UninstantiatedVariableException(l,
-                                                              "Second argument to property/2 must be instantiated to a string or symbol.");
+                        "Second argument to property/2 must be instantiated to a string or symbol.");
                 }
                 nameArg = s.Name;
             }
@@ -1523,7 +1577,7 @@ namespace Prolog
             var offendingVariable = newValue as LogicVariable;
             if (offendingVariable != null)
                 throw new InstantiationException(offendingVariable,
-                                                 "New value argument of set_property must be instantiated to a constant.");
+                    "New value argument of set_property must be instantiated to a constant.");
             objectArg.SetPropertyOrField(nameArg, newValue);
             yield return CutState.Continue;
         }
@@ -1537,7 +1591,7 @@ namespace Prolog
             object objectArg = Term.Deref(args[0]);
             if (objectArg is LogicVariable)
                 throw new UninstantiatedVariableException((LogicVariable) args[0],
-                                                          "First argument to call_method must be instantiated to an object of which to call the method.");
+                    "First argument to call_method must be instantiated to an object of which to call the method.");
             Structure method = Term.Structurify(args[1], "Invalid method argument in call_method");
             string nameArg = method.Functor.Name;
             var methodArgs = new object[method.Arguments.Length];
@@ -1552,15 +1606,16 @@ namespace Prolog
                 throw new ArgumentCountException("higher_order", args, "*predicate");
             var predicate = Term.Deref(args[0]) as Structure;
             if (predicate == null)
-                throw new ArgumentTypeException("higher_order", "predicate", args[0], typeof(Structure));
+                throw new ArgumentTypeException("higher_order", "predicate", args[0], typeof (Structure));
             var higherOrderArguments = new List<int>();
-            for (int argumentIndex=0; argumentIndex<predicate.Arity; argumentIndex++)
+            for (int argumentIndex = 0; argumentIndex < predicate.Arity; argumentIndex++)
             {
                 int indicator = Convert.ToInt32(predicate.Argument(argumentIndex));
                 if (indicator > 0)
                     higherOrderArguments.Add(argumentIndex);
             }
-            context.KnowledgeBase.DeclareHigherOrderArguments(predicate.PredicateIndicator, higherOrderArguments.ToArray());
+            context.KnowledgeBase.DeclareHigherOrderArguments(predicate.PredicateIndicator,
+                higherOrderArguments.ToArray());
             yield return CutState.Continue;
         }
 
@@ -1569,7 +1624,7 @@ namespace Prolog
             if (args.Length != 2) throw new ArgumentCountException("bind", args, "IndexicalName", "Value");
             var name = Term.Deref(args[0]) as Symbol;
             if (name == null)
-                throw new ArgumentTypeException("bind", "IndexicalName", args[0], typeof(Symbol));
+                throw new ArgumentTypeException("bind", "IndexicalName", args[0], typeof (Symbol));
             Indexical.PushIndexicalBinding(name, Term.Deref(args[1]), context);
             try
             {
@@ -1608,7 +1663,7 @@ namespace Prolog
                 // name is instantiated
                 var nameSym = nameArg as Symbol;
                 if (nameSym == null)
-                    throw new ArgumentTypeException("indexical_named", "name", nameArg, typeof(Symbol));
+                    throw new ArgumentTypeException("indexical_named", "name", nameArg, typeof (Symbol));
                 var ind = Indexical.Find(nameSym);
                 if (ind == null)
                     throw new ArgumentException("No indexical exists with the name " + nameSym.Name);
@@ -1617,20 +1672,21 @@ namespace Prolog
 
             if (indexicalArg is LogicVariable)
                 // Both arguments are variables
-                throw new InstantiationException(nameVar, "At least one argument of indexical_named must be instantiated.");
+                throw new InstantiationException(nameVar,
+                    "At least one argument of indexical_named must be instantiated.");
 
             var indexical = indexicalArg as Indexical;
             if (indexical == null)
-                throw new ArgumentTypeException("indexical_named", "indexical", indexicalArg, typeof(Indexical));
+                throw new ArgumentTypeException("indexical_named", "indexical", indexicalArg, typeof (Indexical));
 
             return Term.UnifyAndReturnCutState(nameArg, indexical.Name);
         }
-        
+
         private static IEnumerable<CutState> PredicatePropertyImplementation(object[] args, PrologContext context)
         {
             if (args.Length != 2) throw new ArgumentCountException("predicate_property", args, ":goal", "+property");
             var goal = Term.Structurify(args[0], "Goal argument to predicate_property/2 must be a valid goal.");
-            
+
             var property = Term.Deref(args[1]) as Symbol;
             if (property == null)
                 throw new ArgumentException("Property argument must be an atom.");
@@ -1640,7 +1696,7 @@ namespace Prolog
                     return CutStateSequencer.FromBoolean(Implementations.ContainsKey(goal.Functor));
 
                 default:
-                    throw new ArgumentException("Unknown predicate property: "+ISOPrologWriter.WriteToString(property));
+                    throw new ArgumentException("Unknown predicate property: " + ISOPrologWriter.WriteToString(property));
             }
         }
 
@@ -1673,7 +1729,7 @@ namespace Prolog
 
         // ReSharper disable once ParameterTypeCanBeEnumerable.Local
         private static IEnumerable<CutState> DeclarationDriver(DeclarationHandler handler, object[] args,
-                                                               PrologContext context)
+            PrologContext context)
         {
             foreach (var arg in args)
             {
@@ -1720,9 +1776,11 @@ namespace Prolog
                 throw new ArgumentCountException("set_prolog_flag", args, "flag", "value");
 
             var flag = Term.Deref(args[0]) as Symbol;
-            if (flag == null) throw new ArgumentTypeException("set_prolog_flag", "flag", Term.Deref(args[0]), typeof(Symbol));
+            if (flag == null)
+                throw new ArgumentTypeException("set_prolog_flag", "flag", Term.Deref(args[0]), typeof (Symbol));
             var value = Term.Deref(args[1]) as Symbol;
-            if (value == null) throw new ArgumentTypeException("set_prolog_flag", "value", Term.Deref(args[1]), typeof(Symbol));
+            if (value == null)
+                throw new ArgumentTypeException("set_prolog_flag", "value", Term.Deref(args[1]), typeof (Symbol));
             switch (flag.Name)
             {
                 case "unknown":
@@ -1738,12 +1796,13 @@ namespace Prolog
                             break;
 
                         default:
-                            throw new ArgumentException(value.Name+" is not an acceptable value for the prolog flag 'unknown'; should be fail or error.");
+                            throw new ArgumentException(value.Name +
+                                                        " is not an acceptable value for the prolog flag 'unknown'; should be fail or error.");
                     }
                     break;
 
                 default:
-                    throw new ArgumentException("Unknown prolog flag: "+flag.Name);
+                    throw new ArgumentException("Unknown prolog flag: " + flag.Name);
             }
             return CutStateSequencer.Succeed();
         }
@@ -1766,7 +1825,7 @@ namespace Prolog
             bool savedRandomize = context.Randomize;
             context.Randomize = true;
             foreach (var state in kb.Prove(t.Functor, t.Arguments, context, context.CurrentFrame))
-                if (state==CutState.ForceFail)
+                if (state == CutState.ForceFail)
                     yield break;
                 else
                     yield return state;
@@ -1775,7 +1834,8 @@ namespace Prolog
 
         private static IEnumerable<CutState> ConsultImplementation(object[] args, PrologContext context)
         {
-            if (args.Length < 1 || args.Length > 2) throw new ArgumentCountException("consult", args, "filename", "[kb]");
+            if (args.Length < 1 || args.Length > 2)
+                throw new ArgumentCountException("consult", args, "filename", "[kb]");
             var fileArg = Term.Deref(args[0]);
             var kb = context.KnowledgeBase;
             if (args.Length == 2)
@@ -1790,7 +1850,7 @@ namespace Prolog
                     if (o != null)
                         kb = o.KnowledgeBase();
                     else
-                        throw new ArgumentTypeException("consult", "kb", kbArg, typeof(KnowledgeBase));
+                        throw new ArgumentTypeException("consult", "kb", kbArg, typeof (KnowledgeBase));
                 }
             }
             var s = fileArg as string;
@@ -1802,7 +1862,7 @@ namespace Prolog
                 if (symbol != null)
                     kb.Consult(symbol.Name);
                 else
-                    // ReSharper disable NotResolvedInText
+                // ReSharper disable NotResolvedInText
                     throw new ArgumentException("Filename should be a string or symbol.", "filename");
             }
             // ReSharper restore NotResolvedInText
@@ -1821,7 +1881,7 @@ namespace Prolog
                 if (symbol != null)
                     context.KnowledgeBase.Reconsult(symbol.Name);
                 else
-                    // ReSharper disable NotResolvedInText
+                // ReSharper disable NotResolvedInText
                     throw new ArgumentException("Filename should be a string or symbol.", "filename");
             }
             // ReSharper restore NotResolvedInText
@@ -1849,7 +1909,7 @@ namespace Prolog
         private static IEnumerable<CutState> AssertzImplementation(object[] args, PrologContext context)
         {
             if (args.Length != 1) throw new ArgumentCountException("assertz", args, "term");
-            context.KnowledgeBase.AssertZ(ELProlog.IsELTerm(args[0])?args[0]:Term.CopyInstantiation(args[0]));
+            context.KnowledgeBase.AssertZ(ELProlog.IsELTerm(args[0]) ? args[0] : Term.CopyInstantiation(args[0]));
             return CutStateSequencer.Succeed();
         }
 
@@ -1897,10 +1957,10 @@ namespace Prolog
             Structure head = Term.Structurify(h, "Head argument to clause is not a valid term.");
             if (Implementations.ContainsKey(head.Functor))
                 throw new PrologException(new Structure("error",
-                                                        new Structure("permission_error", Symbol.Intern("access"),
-                                                                      Symbol.Intern("private_procedure"),
-                                                                      new Structure("/", head.Functor,
-                                                                                    head.Arguments.Length))));
+                    new Structure("permission_error", Symbol.Intern("access"),
+                        Symbol.Intern("private_procedure"),
+                        new Structure("/", head.Functor,
+                            head.Arguments.Length))));
             object body = Term.Deref(args[1]);
             if (!(body is Structure) && !(body is Symbol) && !(body is bool) && !(body is LogicVariable))
                 throw new GoalException(body, "Body argument of clause/2 must be a valid goal or a variable:");
@@ -1928,7 +1988,8 @@ namespace Prolog
             object arg = Term.Deref(args[0]);
             var v = arg as LogicVariable;
             if (v != null)
-                throw new InstantiationException(v, "first argument to call_with_step_limit/2 must be instantiated to an integer.");
+                throw new InstantiationException(v,
+                    "first argument to call_with_step_limit/2 must be instantiated to an integer.");
 
             int newStepLimit = Convert.ToInt32(arg);
             int previousLimit = context.StepLimit;
@@ -1936,12 +1997,12 @@ namespace Prolog
             context.StepLimit = newStepLimit;
             context.StepsRemaining = newStepLimit;
 #pragma warning disable 0168
-                // ReSharper disable once UnusedVariable
-                foreach (var ignore in context.Prove(args[1], "Argument to step_limit/2 must be a valid goal"))
+            // ReSharper disable once UnusedVariable
+            foreach (var ignore in context.Prove(args[1], "Argument to step_limit/2 must be a valid goal"))
 #pragma warning restore 0168
-                {
-                    yield return CutState.Continue;
-                }
+            {
+                yield return CutState.Continue;
+            }
             context.StepLimit = previousLimit;
             context.StepsRemaining = previousRemaining;
         }
@@ -1998,7 +2059,7 @@ namespace Prolog
             }
             else
             {
-                if (type.IsSubclassOf(typeof(Object)))
+                if (type.IsSubclassOf(typeof (Object)))
                     foreach (var o in Object.FindObjectsOfType(type))
 #pragma warning disable 414, 168, 219
                         // ReSharper disable once UnusedVariable
@@ -2006,20 +2067,56 @@ namespace Prolog
 #pragma warning restore 414, 168, 219
                             yield return CutState.Continue;
                 else
-                    // ReSharper disable once NotResolvedInText
+                // ReSharper disable once NotResolvedInText
                     throw new ArgumentException("Cannot enumerate instances of type " + type.Name, "type");
                 // ReSharper restore NotResolvedInText
             }
         }
 
-        private static IEnumerable<CutState> ComponentOfGameObjectWithTypeImplementation(object[] args, PrologContext context)
+#if DeprecatedPrimitives
+        private static IEnumerable<CutState> ComponentOfGameObjectWithTypeImplementation(object[] args,
+            PrologContext context)
         {
-            if (args.Length != 3) throw new ArgumentCountException("component_of_gameobject_with_type", args, "component", "gameobject", "+class");
+            if (args.Length != 3)
+                throw new ArgumentCountException("component_of_gameobject_with_type", args, "component", "gameobject",
+                    "+class");
             object componentArg = Term.Deref(args[0]);
             object gameobjectArg = Term.Deref(args[1]);
             var typeArg = Term.Deref(args[2]);
             var type = typeArg as Type;
-            if (type == null) throw new ArgumentTypeException("component_of_gameobject_with_type", "type", typeArg, typeof(Type));
+            if (type == null)
+                throw new ArgumentTypeException("component_of_gameobject_with_type", "type", typeArg, typeof (Type));
+            var v = componentArg as LogicVariable;
+            if (v == null)
+            {
+                // Component is known; solve for the gameobject.
+                if (!type.IsInstanceOfType(componentArg))
+                    return CutStateSequencer.Fail();
+                return Term.UnifyAndReturnCutState(((Component) componentArg).gameObject, gameobjectArg);
+            }
+            var gameObject = gameobjectArg as GameObject;
+            if (gameObject != null)
+                return EnumerateComponents(v, gameObject, type);
+            var gov = gameobjectArg as LogicVariable;
+            if (gov != null)
+                return EnumerateGameObjectsAndComponents(v, gov, type);
+            throw new ArgumentTypeException("component_of_gameobject_with_type", "gameobject", gameobjectArg,
+                typeof (GameObject));
+        }
+#endif
+
+        private static IEnumerable<CutState> HasComponentImplementation(object[] args,
+            PrologContext context)
+        {
+            if (args.Length != 3)
+                throw new ArgumentCountException("has_component", args, "gameobject", "component",
+                    "+class");
+            object componentArg = Term.Deref(args[1]);
+            object gameobjectArg = Term.Deref(args[0]);
+            var typeArg = Term.Deref(args[2]);
+            var type = typeArg as Type;
+            if (type == null)
+                throw new ArgumentTypeException("has_component", "type", typeArg, typeof(Type));
             var v = componentArg as LogicVariable;
             if (v == null)
             {
@@ -2034,17 +2131,19 @@ namespace Prolog
             var gov = gameobjectArg as LogicVariable;
             if (gov != null)
                 return EnumerateGameObjectsAndComponents(v, gov, type);
-            throw new ArgumentTypeException("component_of_gameobject_with_type", "gameobject", gameobjectArg, typeof(GameObject));
+            throw new ArgumentTypeException("has_component", "gameobject", gameobjectArg,
+                typeof(GameObject));
         }
 
-        private static IEnumerable<CutState> EnumerateGameObjectsAndComponents(LogicVariable v, LogicVariable gov, Type type)
+        private static IEnumerable<CutState> EnumerateGameObjectsAndComponents(LogicVariable v, LogicVariable gov,
+            Type type)
         {
             foreach (var component in Object.FindObjectsOfType(type))
             {
 #pragma warning disable 414, 168, 219
                 // ReSharper disable UnusedVariable
                 foreach (var ignore in v.Unify(component))
-                    foreach (var ignore2 in gov.Unify(((Component)component).gameObject))
+                    foreach (var ignore2 in gov.Unify(((Component) component).gameObject))
                         // ReSharper restore UnusedVariable
 #pragma warning restore 414, 168, 219
                         yield return CutState.Continue;
@@ -2072,7 +2171,8 @@ namespace Prolog
             if (v == null)
             {
                 var child = childArg as GameObject;
-                if (child == null) throw new ArgumentTypeException("parent_of_gameobject", "child", childArg, typeof(GameObject));
+                if (child == null)
+                    throw new ArgumentTypeException("parent_of_gameobject", "child", childArg, typeof (GameObject));
                 // Child is known; solve for the parent.
                 return Term.UnifyAndReturnCutState(child.GetParent(), parentArg);
             }
@@ -2086,7 +2186,7 @@ namespace Prolog
         private static IEnumerable<CutState> EnumerateChildren(LogicVariable child, GameObject parent)
         {
             var transform = parent.transform;
-            for (int i=0; i<transform.childCount; i++)
+            for (int i = 0; i < transform.childCount; i++)
 #pragma warning disable 414, 168, 219
                 // ReSharper disable once UnusedVariable
                 foreach (var ignore in child.Unify(transform.GetChild(i).gameObject))
@@ -2116,7 +2216,7 @@ namespace Prolog
             {
                 for (int i = vars.Count - 1; i >= 0; i--)
                     unifier = new Structure(Symbol.PrologListConstructor, new Structure(SEquals, vars[i], values[i]),
-                                            unifier);
+                        unifier);
             }
             return Term.UnifyAndReturnCutState(args[2], unifier);
         }
@@ -2142,7 +2242,7 @@ namespace Prolog
         private static IEnumerable<CutState> NotEquivalentImplementation(object[] args, PrologContext context)
         {
             if (args.Length != 2) throw new ArgumentCountException("\\==", args, "term1", "term2");
-            return Term.Identical(args[0], args[1]) ?  CutStateSequencer.Fail() : CutStateSequencer.Succeed();
+            return Term.Identical(args[0], args[1]) ? CutStateSequencer.Fail() : CutStateSequencer.Succeed();
         }
 
         private static IEnumerable<CutState> CopyTermImplementation(object[] args, PrologContext context)
@@ -2165,7 +2265,7 @@ namespace Prolog
                 {
                     if (listArg is LogicVariable)
                         throw new UninstantiatedVariableException((LogicVariable) args[0],
-                                                                  "Cannot perform X =.. Y with both variables uninstantiated.");
+                            "Cannot perform X =.. Y with both variables uninstantiated.");
                     throw new ArgumentException("Second argument must be a list or uninstantiated variable.");
                 }
                 // Need to build term from list
@@ -2181,6 +2281,7 @@ namespace Prolog
         }
 
         private static readonly Symbol XSymbol = Symbol.Intern("X");
+
         private static IEnumerable<CutState> FunctorImplementation(object[] args, PrologContext context)
         {
             if (args.Length != 3) throw new ArgumentCountException("functor", args, "term", "functor", "arity");
@@ -2208,7 +2309,7 @@ namespace Prolog
                         {
                             var fv = functorArg as LogicVariable;
                             if (fv == null)
-                                throw new ArgumentTypeException("functor", "functor", functorArg, typeof(Symbol));
+                                throw new ArgumentTypeException("functor", "functor", functorArg, typeof (Symbol));
                             throw new InstantiationException(fv, "Arguments are insufficiently instantiated.");
                         }
                         var blankArgs = new object[arity];
@@ -2230,7 +2331,7 @@ namespace Prolog
                     {
                         throw new InstantiationException(arg, "Arguments are not sufficiently instantiated");
                     }
-                    throw new ArgumentTypeException("functor", "arity", arityArg, typeof(int));
+                    throw new ArgumentTypeException("functor", "arity", arityArg, typeof (int));
                 }
             }
             else
@@ -2265,28 +2366,29 @@ namespace Prolog
                 var v = args[1] as LogicVariable;
                 if (v != null)
                     throw new InstantiationException(v, "Structure argument was not instantiated.");
-                throw new ArgumentTypeException("arg", "structure", args[1], typeof(Structure));
+                throw new ArgumentTypeException("arg", "structure", args[1], typeof (Structure));
             }
 
-	    var numberArg = Term.Deref(args[0]);
+            var numberArg = Term.Deref(args[0]);
             if (!(numberArg is int))
             {
                 var v = numberArg as LogicVariable;
                 if (v != null)
                     return EnumerateStructureArguments(v, s, Term.Deref(args[2]));
-                throw new ArgumentTypeException("arg", "argument_number", args[0], typeof(int));
+                throw new ArgumentTypeException("arg", "argument_number", args[0], typeof (int));
             }
 
             var argNumber = (int) numberArg;
-            
+
             if (argNumber < 0)
                 throw new IndexOutOfRangeException("The specified argument number is invalid.");
             if (argNumber == 0 || argNumber > s.Arguments.Length)
                 return CutStateSequencer.Fail();
-            return Term.UnifyAndReturnCutState(s.Arguments[argNumber-1], args[2]);
+            return Term.UnifyAndReturnCutState(s.Arguments[argNumber - 1], args[2]);
         }
 
-        private static IEnumerable<CutState> EnumerateStructureArguments(LogicVariable argNumberArgument, Structure s, object argArgument)
+        private static IEnumerable<CutState> EnumerateStructureArguments(LogicVariable argNumberArgument, Structure s,
+            object argArgument)
         {
             var i = 1;
             foreach (var arg in s.Arguments)
@@ -2377,7 +2479,7 @@ namespace Prolog
 
         // Called from Length to generate successively longer tails for the list.
         private static IEnumerable<CutState> EnumerateListExtensions(LogicVariable lengthVar, int elementsProvided,
-                                                                     LogicVariable tailVar)
+            LogicVariable tailVar)
         {
             Structure listTail = null;
             for (int i = elementsProvided;; i++)
@@ -2404,23 +2506,27 @@ namespace Prolog
             if (args.Length != 2) throw new ArgumentCountException("member", args, "element", "list");
             object objectArg = Term.Deref(args[0]);
             object listArg = Term.Deref(args[1]);
-            var iList = listArg as IList;
-            if (iList != null)
+            var iEnum = listArg as IEnumerable;
+            if (iEnum != null)
             {
                 var variable = objectArg as LogicVariable;
                 if (variable != null)
-                    return EnumerateIList(iList, variable);
-                // Simple check for whether a known element appears in an IList.
+                    return EnumerateIEnumerable(iEnum, variable);
+                // Simple check for whether a known element appears in an IEnumerable.
                 if (Term.IsGround(objectArg))
                 {
-                    return CutStateSequencer.FromBoolean(iList.Contains(objectArg));
+                    foreach (var item in iEnum)
+                        if (item.Equals(objectArg))
+                            return CutStateSequencer.Succeed();
+                    return CutStateSequencer.Fail();
                 }
-                throw new ArgumentException("member(o, l) not implemented for non-ground o when l is an IList rather than a Prolog list.");
+                throw new ArgumentException(
+                    "member(o, l) not implemented for non-ground o when l is an IList rather than a Prolog list.");
             }
             return MemberOfPrologList(listArg, objectArg);
         }
 
-        static IEnumerable<CutState> EnumerateIList(IList listArg, LogicVariable objectArg)
+        static IEnumerable<CutState> EnumerateIEnumerable(IEnumerable listArg, LogicVariable objectArg)
         {
             foreach (var e in listArg)
             {
@@ -2521,9 +2627,10 @@ namespace Prolog
                 yield break;
             var arg = listArg as LogicVariable;
             if (arg != null)
-                throw new InstantiationException(arg, "List argument to random_member/2 must be instantiated to a proper list.");
+                throw new InstantiationException(arg,
+                    "List argument to random_member/2 must be instantiated to a proper list.");
             var length = Prolog.PrologListLength(listArg);
-            var shuffler = new Shuffler((ushort)length);
+            var shuffler = new Shuffler((ushort) length);
             while (!shuffler.Done)
 #pragma warning disable 414, 168, 219
                 // ReSharper disable once UnusedVariable
@@ -2567,14 +2674,14 @@ namespace Prolog
                         yield return CutState.Continue;
         }
 
-        static IEnumerable<CutState>  ReverseImplementation(object[] args, PrologContext context)
+        static IEnumerable<CutState> ReverseImplementation(object[] args, PrologContext context)
         {
             if (args.Length != 2)
                 throw new ArgumentCountException("reverse", args, "forward_list", "backward_list");
             return ReverseAppend(args[0], null, Term.Deref(args[1]));
         }
 
-        static IEnumerable<CutState>  ReverseAppend(object before, object after, object together)
+        static IEnumerable<CutState> ReverseAppend(object before, object after, object together)
         {
             // Base case
 #pragma warning disable 414, 168, 219
@@ -2593,41 +2700,76 @@ namespace Prolog
 #pragma warning disable 414, 168, 219
             // ReSharper disable UnusedVariable
             foreach (var ignore in Term.Unify(before, beforePattern))
-                    foreach (var ignore2 in ReverseAppend(beforeTail, afterPattern, together))
-                        // ReSharper restore UnusedVariable
+                foreach (var ignore2 in ReverseAppend(beforeTail, afterPattern, together))
+                    // ReSharper restore UnusedVariable
 #pragma warning restore 414, 168, 219
-                        yield return CutState.Continue;            
+                    yield return CutState.Continue;
         }
 
         private static PrimitiveImplementation MakeComparisonPredicate(string name,
-                                                                       Func<double, double, bool> comparison)
+            Func<double, double, bool> comparison)
         {
             return ((args, context) => ComparisonPredicateDriver(name, context, comparison, args));
         }
 
         private static IEnumerable<CutState> ComparisonPredicateDriver(string name,
-                                                                       PrologContext context,
-                                                                       Func<double, double, bool> comparison,
-                                                                       object[] args)
+            PrologContext context,
+            Func<double, double, bool> comparison,
+            object[] args)
         {
             if (args.Length != 2) throw new ArgumentCountException(name, args, "+expression1", "+expression2");
-            if (comparison(Convert.ToDouble(FunctionalExpression.Eval(args[0], context)), Convert.ToDouble(FunctionalExpression.Eval(args[1], context))))
+            if (comparison(Convert.ToDouble(FunctionalExpression.Eval(args[0], context)),
+                Convert.ToDouble(FunctionalExpression.Eval(args[1], context))))
                 yield return CutState.Continue;
         }
 
+        private static PrimitiveImplementation MakeGeneralComparisonPredicate(string name,
+            Func<object, object, bool> comparison)
+        {
+            return ((args, context) => GeneralComparisonPredicateDriver(name, context, comparison, args));
+        }
 
+        private static IEnumerable<CutState> GeneralComparisonPredicateDriver(string name,
+            PrologContext context,
+            Func<object, object, bool> comparison,
+            object[] args)
+        {
+            if (args.Length != 2) throw new ArgumentCountException(name, args, "+expression1", "+expression2");
+
+            var arg1 = FunctionalExpression.Eval(args[0], context);
+            var arg2 = FunctionalExpression.Eval(args[1], context);
+            if (IsNumeric(arg1) && IsNumeric(arg2))
+                return CutStateSequencer.FromBoolean(comparison(Convert.ToDouble(arg1),
+                    Convert.ToDouble(arg2)));
+            return CutStateSequencer.FromBoolean(comparison(arg1, arg2));
+        }
+
+        public static bool IsNumeric(object value)
+        {
+            return value is sbyte
+                   || value is byte
+                   || value is short
+                   || value is ushort
+                   || value is int
+                   || value is uint
+                   || value is long
+                   || value is ulong
+                   || value is float
+                   || value is double
+                   || value is decimal;
+        }
 
 
         // NEW STUFF
         private static PrimitiveImplementation MakeTermComparisonPredicate(string name,
-                                                                               Func<int, bool> comparison)
+            Func<int, bool> comparison)
         {
             return ((args, context) => TermComparisonPredicateDriver(name, comparison, args));
         }
 
         private static IEnumerable<CutState> TermComparisonPredicateDriver(string name,
-                                                                       Func<int, bool> test,
-                                                                       object[] args)
+            Func<int, bool> test,
+            object[] args)
         {
             if (args.Length != 2) throw new ArgumentCountException(name, args, "+expression1", "+expression2");
             if (test(Term.Compare(args[0], args[1])))
@@ -2648,7 +2790,7 @@ namespace Prolog
          SuppressMessage("Microsoft.Globalization", "CA1305:SpecifyIFormatProvider",
              MessageId = "System.String.Format(System.String,System.Object[])")]
         private static IEnumerable<CutState> NullFailingTypePredicateDriver(string name, Func<object, bool> predicate,
-                                                                            object[] args)
+            object[] args)
         {
             if (args.Length != 1) throw new ArgumentCountException(name, args, "+object");
             object arg = Term.Deref(args[0]);
@@ -2667,7 +2809,7 @@ namespace Prolog
          SuppressMessage("Microsoft.Globalization", "CA1305:SpecifyIFormatProvider",
              MessageId = "System.String.Format(System.String,System.Object[])")]
         private static IEnumerable<CutState> NullTestingTypePredicateDriver(string name, Func<object, bool> predicate,
-                                                                            object[] args)
+            object[] args)
         {
             if (args.Length != 1) throw new ArgumentCountException(name, args, "+object");
             object arg = Term.Deref(args[0]);
@@ -2722,7 +2864,7 @@ namespace Prolog
             var s = arg0 as Symbol;
             if (s == null)
             {
-                throw new ArgumentTypeException("register_lexical_item", "word", Term.Deref(args[0]), typeof(Symbol));
+                throw new ArgumentTypeException("register_lexical_item", "word", Term.Deref(args[0]), typeof (Symbol));
             }
             Prolog.RegisterLexicalItem(s);
             return CutStateSequencer.Succeed();
@@ -2741,7 +2883,7 @@ namespace Prolog
                 // Object unbound - need to parse string.
                 if (stringVar == null)
                     return Term.UnifyAndReturnCutState(objectVar,
-                                                       ISOPrologReader.Read(stringArg as string));
+                        ISOPrologReader.Read(stringArg as string));
                 return Term.UnifyAndReturnCutState(Term.ToStringInPrologFormat(objectArg), stringVar);
             }
             return Term.UnifyAndReturnCutState(Term.ToStringInPrologFormat(objectArg), stringArg);
@@ -2753,14 +2895,14 @@ namespace Prolog
                 throw new ArgumentCountException("starts_with", args, "substring", "string_or_symbol");
             var substringArg = Term.Deref(args[0]) as string;
             if (substringArg == null)
-                throw new ArgumentTypeException("starts_with", "substring", args[0], typeof(string));
+                throw new ArgumentTypeException("starts_with", "substring", args[0], typeof (string));
             object objectArg = Term.Deref(args[1]);
             var stringToCheck = objectArg as string;
             if (stringToCheck == null)
             {
                 var sym = objectArg as Symbol;
                 if (sym == null)
-                    throw new ArgumentTypeException("starts_with", "string_or_symbol", args[1], typeof(string));
+                    throw new ArgumentTypeException("starts_with", "string_or_symbol", args[1], typeof (string));
                 stringToCheck = sym.Name;
             }
             return CutStateSequencer.FromBoolean(stringToCheck.StartsWith(substringArg));
@@ -2772,14 +2914,14 @@ namespace Prolog
                 throw new ArgumentCountException("ends_with", args, "substring", "string_or_symbol");
             var substringArg = Term.Deref(args[0]) as string;
             if (substringArg == null)
-                throw new ArgumentTypeException("ends_with", "substring", args[0], typeof(string));
+                throw new ArgumentTypeException("ends_with", "substring", args[0], typeof (string));
             object objectArg = Term.Deref(args[1]);
             var stringToCheck = objectArg as string;
             if (stringToCheck == null)
             {
                 var sym = objectArg as Symbol;
                 if (sym == null)
-                    throw new ArgumentTypeException("ends_with", "string_or_symbol", args[1], typeof(string));
+                    throw new ArgumentTypeException("ends_with", "string_or_symbol", args[1], typeof (string));
                 stringToCheck = sym.Name;
             }
             return CutStateSequencer.FromBoolean(stringToCheck.EndsWith(substringArg));
@@ -2788,20 +2930,21 @@ namespace Prolog
         private static IEnumerable<CutState> StartsWithOneOfImplementation(object[] args, PrologContext context)
         {
             if (args.Length != 2)
-                throw new ArgumentCountException("starts_with_one_of", args, "possible_first_letters", "string_or_symbol");
+                throw new ArgumentCountException("starts_with_one_of", args, "possible_first_letters",
+                    "string_or_symbol");
             var firstLetterArg = Term.Deref(args[0]) as string;
             if (firstLetterArg == null)
-                throw new ArgumentTypeException("starts_with_one_of", "possible_first_letters", args[0], typeof(string));
+                throw new ArgumentTypeException("starts_with_one_of", "possible_first_letters", args[0], typeof (string));
             object objectArg = Term.Deref(args[1]);
             var stringToCheck = objectArg as string;
             if (stringToCheck == null)
             {
                 var sym = objectArg as Symbol;
                 if (sym == null)
-                    throw new ArgumentTypeException("starts_with_one_of", "string_or_symbol", args[1], typeof(string));
+                    throw new ArgumentTypeException("starts_with_one_of", "string_or_symbol", args[1], typeof (string));
                 stringToCheck = sym.Name;
             }
-            return CutStateSequencer.FromBoolean(firstLetterArg.IndexOf(stringToCheck[0])>=0);
+            return CutStateSequencer.FromBoolean(firstLetterArg.IndexOf(stringToCheck[0]) >= 0);
         }
 
         private static IEnumerable<CutState> ContainsSubstringImplementation(object[] args, PrologContext context)
@@ -2810,14 +2953,14 @@ namespace Prolog
                 throw new ArgumentCountException("contains_substring", args, "substring", "string_or_symbol");
             var substringArg = Term.Deref(args[0]) as string;
             if (substringArg == null)
-                throw new ArgumentTypeException("contains_substring", "substring", args[0], typeof(string));
+                throw new ArgumentTypeException("contains_substring", "substring", args[0], typeof (string));
             object objectArg = Term.Deref(args[1]);
             var stringToCheck = objectArg as string;
             if (stringToCheck == null)
             {
                 var sym = objectArg as Symbol;
                 if (sym == null)
-                    throw new ArgumentTypeException("contains_substring", "string_or_symbol", args[1], typeof(string));
+                    throw new ArgumentTypeException("contains_substring", "string_or_symbol", args[1], typeof (string));
                 stringToCheck = sym.Name;
             }
             return CutStateSequencer.FromBoolean(stringToCheck.Contains(substringArg));
@@ -2830,13 +2973,14 @@ namespace Prolog
             var singularArg = Term.Deref(args[0]);
             var saVar = singularArg as LogicVariable;
             if (saVar != null)
-                throw new InstantiationException(saVar, "First argument to plural_form/2 must be instantiated to a string or symbol.");
+                throw new InstantiationException(saVar,
+                    "First argument to plural_form/2 must be instantiated to a string or symbol.");
             var singular = singularArg as string;
             if (singular == null)
             {
                 var sym = singularArg as Symbol;
                 if (sym == null)
-                    throw new ArgumentTypeException("plural_form", "singular_form", singularArg, typeof(string));
+                    throw new ArgumentTypeException("plural_form", "singular_form", singularArg, typeof (string));
                 singular = sym.Name;
             }
             return Term.UnifyAndReturnCutState(StringUtils.PluralForm(singular), args[1]);
@@ -2857,12 +3001,13 @@ namespace Prolog
                     return Term.UnifyAndReturnCutState(Symbol.Intern(stringForm), atomArg);
                 var stringVar = stringArg as LogicVariable;
                 if (stringVar != null)
-                    throw new InstantiationException(stringVar, "At least one argument to atom_string/2 must be instantiated.");
-                throw new ArgumentTypeException("atom_string", "string", atomArg, typeof(string));
+                    throw new InstantiationException(stringVar,
+                        "At least one argument to atom_string/2 must be instantiated.");
+                throw new ArgumentTypeException("atom_string", "string", atomArg, typeof (string));
             }
             var sym = atomArg as Symbol;
             if (sym == null)
-                throw new ArgumentTypeException("atom_string", "atom", atomArg, typeof(Symbol));
+                throw new ArgumentTypeException("atom_string", "atom", atomArg, typeof (Symbol));
             return Term.UnifyAndReturnCutState(sym.Name, args[1]);
         }
 
@@ -2882,9 +3027,11 @@ namespace Prolog
                     // Symbol arg is bound - need to find the object with this name
                     var name = symbolArg as Symbol;
                     if (name == null)
-                        throw new ArgumentTypeException("game_object_name", "name", symbolArg, typeof(Symbol));
+                        throw new ArgumentTypeException("game_object_name", "name", symbolArg, typeof (Symbol));
                     var foundGameObject = GameObject.Find(name.Name);
-                    return foundGameObject == null ? CutStateSequencer.Fail():Term.UnifyAndReturnCutState(objectVar, foundGameObject);
+                    return foundGameObject == null
+                        ? CutStateSequencer.Fail()
+                        : Term.UnifyAndReturnCutState(objectVar, foundGameObject);
                 }
                 // Both are unbound
                 return EnumerateGameObjectsAndNames(objectArg, symbolArg);
@@ -2892,7 +3039,7 @@ namespace Prolog
             // Object arg is bound
             var gameObject = objectArg as GameObject;
             if (gameObject == null)
-                throw new ArgumentTypeException("game_object_name", "game_object", objectArg, typeof(GameObject));
+                throw new ArgumentTypeException("game_object_name", "game_object", objectArg, typeof (GameObject));
             return Term.UnifyAndReturnCutState(Symbol.Intern(gameObject.name), symbolArg);
         }
 
@@ -2944,7 +3091,7 @@ namespace Prolog
                     break;
 
                 case 2:
-                    ((TextWriter)Term.Deref(args[0])).Write(Term.ToStringInPrologFormat(args[1]));
+                    ((TextWriter) Term.Deref(args[0])).Write(Term.ToStringInPrologFormat(args[1]));
                     break;
 
                 default:
@@ -2962,7 +3109,7 @@ namespace Prolog
                     break;
 
                 case 2:
-                    ((TextWriter)Term.Deref(args[0])).WriteLine(Term.ToStringInPrologFormat(args[1]));
+                    ((TextWriter) Term.Deref(args[0])).WriteLine(Term.ToStringInPrologFormat(args[1]));
                     break;
 
                 default:
@@ -3046,7 +3193,7 @@ namespace Prolog
             {
                 var s = p as Symbol;
                 if (s == null)
-                    throw new ArgumentTypeException("open", "path", args[0], typeof(string));
+                    throw new ArgumentTypeException("open", "path", args[0], typeof (string));
                 path = s.Name;
             }
             var mode = Term.Deref(args[1]) as Symbol;
@@ -3099,7 +3246,7 @@ namespace Prolog
                 if (writer != null)
                     writer.Close();
                 else
-                    throw new ArgumentTypeException("close", "stream", arg, typeof(ISOPrologReader));
+                    throw new ArgumentTypeException("close", "stream", arg, typeof (ISOPrologReader));
             }
             return CutStateSequencer.Succeed();
         }
@@ -3126,10 +3273,12 @@ namespace Prolog
 
         private static IEnumerable<CutState> ELNonExclusiveQueryImplementation(object[] args, PrologContext context)
         {
-            if (args.Length != 2) throw new ArgumentCountException(ELProlog.NonExclusiveOperator, args, "parent_expression", "key");
+            if (args.Length != 2)
+                throw new ArgumentCountException(ELProlog.NonExclusiveOperator, args, "parent_expression", "key");
             ELNode node;
             ELNodeEnumerator enumerator;
-            if (ELProlog.TryChildQuery(out node, out enumerator, Term.Deref(args[0]), Term.Deref(args[1]), false, context))
+            if (ELProlog.TryChildQuery(out node, out enumerator, Term.Deref(args[0]), Term.Deref(args[1]), false,
+                context))
             {
                 if (node != null)
                     yield return CutState.Continue;
@@ -3143,10 +3292,12 @@ namespace Prolog
 
         private static IEnumerable<CutState> ELExclusiveQueryImplementation(object[] args, PrologContext context)
         {
-            if (args.Length != 2) throw new ArgumentCountException(ELProlog.ExclusiveOperator, args, "parent_expression", "key");
+            if (args.Length != 2)
+                throw new ArgumentCountException(ELProlog.ExclusiveOperator, args, "parent_expression", "key");
             ELNode node;
             ELNodeEnumerator enumerator;
-            var tryQuery = ELProlog.TryChildQuery(out node, out enumerator, Term.Deref(args[0]), Term.Deref(args[1]), true, context);
+            var tryQuery = ELProlog.TryChildQuery(out node, out enumerator, Term.Deref(args[0]), Term.Deref(args[1]),
+                true, context);
             if (tryQuery)
             {
                 if (node != null)
@@ -3204,7 +3355,8 @@ namespace Prolog
                 throw new ArgumentCountException("unpause_game", args, 0);
             PauseManager.Paused = false;
             return CutStateSequencer.Succeed();
-        } 
-        #endregion
+        }
+
+#endregion
     }
 }

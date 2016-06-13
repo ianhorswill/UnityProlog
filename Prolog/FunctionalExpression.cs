@@ -115,12 +115,12 @@ namespace Prolog
                     if (t.Arguments.Length != 1) throw new ArgumentCountException("floor", t.Arguments, "number");
                     return Convert.ToSingle(Eval(t.Arguments[0], context));
 
-		case "min":
+		        case "min":
                     if (t.Arguments.Length != 2)
                         throw new ArgumentCountException("min", t.Arguments, "number1", "number2");
                     return GenericArithmetic.Min(Eval(t.Arguments[0], context), Eval(t.Arguments[1], context));
 
-		case "max":
+		        case "max":
                     if (t.Arguments.Length != 2)
                         throw new ArgumentCountException("max", t.Arguments, "number1", "number2");
                     return GenericArithmetic.Max(Eval(t.Arguments[0], context), Eval(t.Arguments[1], context));
@@ -196,6 +196,39 @@ namespace Prolog
                         throw new ArgumentCountException(".", t.Arguments, "object");
                     }
                     return EvalMemberExpression(t.Arguments[0], t.Arguments[1], context);
+
+                case "::":
+                    if (t.Arguments.Length != 2)
+                    {
+                        throw new ArgumentCountException("::", t.Arguments, "object");
+                    }
+                    {
+                        object o = Eval(t.Argument(0), context);
+                        GameObject go = o as GameObject;
+                        if (go == null)
+                            throw new ArgumentTypeException("::", "object", o, typeof(GameObject));
+                        o = t.Argument(1);
+                        Type type = o as Type;
+                        if (type == null)
+                        {
+                            string s = o as string;
+                            if (s != null)
+                                type = TypeUtils.FindType(s);
+                            else
+                            {
+                                Symbol sym = o as Symbol;
+                                if (sym != null)
+                                    type = TypeUtils.FindType(sym.Name);
+                                else
+                                {
+                                    throw new ArgumentTypeException("::", "component_type", o, typeof(Type));
+                                }
+                            }
+                        }
+                        if (!type.IsSubclassOf(typeof(Component)))
+                            throw new ArgumentException("Component type specified is not a Component type"+type.Name);
+                        return go.GetComponent(type);
+                    }
 
                 case "property":
                 {

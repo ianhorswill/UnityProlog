@@ -2577,6 +2577,9 @@ namespace Prolog
             if (pStack == null) return false;
             reduce(1000);
             sp = pStack;
+            if (sp.tokentype == OPEN_CT_TOKEN)
+                pStack = pStack.down;
+            else
             do
             {
                 if (isterm(sp.specifier) ||

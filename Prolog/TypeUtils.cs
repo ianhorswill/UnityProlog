@@ -266,10 +266,10 @@ namespace Prolog
             else
             {
                 t = value.GetType();
-                FieldInfo f = t.GetField(memberName);
+                FieldInfo f = t.GetField(memberName, FieldOrPropertyBindingFlags);
                 if (f != null)
                     return f.GetValue(value);
-                PropertyInfo p = t.GetProperty(memberName);
+                PropertyInfo p = t.GetProperty(memberName, FieldOrPropertyBindingFlags);
                 if (p != null)
                     return p.GetValue(value, new object[0]);
             }
