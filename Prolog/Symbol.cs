@@ -383,6 +383,10 @@ namespace Prolog
         /// </summary>
         public static readonly Symbol ColonColon = Intern("::");
 
+        /// <summary>
+        /// The Prolog symbol '::'
+        /// </summary>
+        public static readonly Symbol Text = Intern("text");
         #endregion
     }
 }

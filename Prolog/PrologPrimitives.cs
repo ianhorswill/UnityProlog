@@ -416,6 +416,8 @@ namespace Prolog
                 "Runs GOAL repeatedly, COUNT times.", "+goal", "*count");
             DefinePrimitive("word_list", WordListImplementation, "definite clause grammars",
                 "Parses/unparses STRING into a LIST of word.", "?string", "?list");
+            DefinePrimitive("quasiquote_parse", QuasiquoteParseImplementation, "definite clause grammars",
+                "LIST is the parse of the quasiquoted STRING, and sharing any variables appearing in TERM.", "+string", "+term" ,"?list");
             DefinePrimitive("register_lexical_item", RegisterLexicalItemImplementation, "definite clause grammars",
                 "Adds WORD to list of words recognized by word_list.", "+word");
             DefinePrimitive("string_representation", StringRepresentationImplementation, "other predicates",
@@ -2855,6 +2857,41 @@ namespace Prolog
                     "First argument must be a string (or uninstantiated) and second argument must be a list of words (or uninstantiated).");
             }
             return Term.UnifyAndReturnCutState(Prolog.StringToWordList(s), args[1]);
+        }
+
+        private static IEnumerable<CutState> QuasiquoteParseImplementation(object[] args, PrologContext context)
+        {
+            if (args.Length != 3) throw new ArgumentCountException("quasiquote_parse", args, "string", "term", "list_of_words");
+            object arg0 = Term.Deref(args[0]);
+            var s = arg0 as string;
+            if (s == null)
+            {
+                throw new ArgumentException(
+                    "First argument must be a string and second argument must be a list or uninstantiated.");
+            }
+            return Term.UnifyAndReturnCutState(Prolog.StringToWordList(s, true, FindVars(args[1])), args[2]);
+        }
+
+        static List<LogicVariable> FindVars(object term)
+        {
+            var vars = new List<LogicVariable>();
+            FindVarsWalk(term, vars);
+            return vars;
+        }
+
+        static void FindVarsWalk(object term, List<LogicVariable> vars)
+        {
+            term = Term.Deref(term);
+            var l = term as LogicVariable;
+            if (l != null)
+                vars.Add(l);
+            else
+            {
+                var s = term as Structure;
+                if (s != null)
+                    foreach (var arg in s.Arguments)
+                        FindVarsWalk(arg, vars);
+            }
         }
 
         private static IEnumerable<CutState> RegisterLexicalItemImplementation(object[] args, PrologContext context)

@@ -676,21 +676,30 @@ namespace Prolog
         [SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "Reconsult")]
         public void Reconsult(string path)
         {
-            path = Prolog.LoadFilePath(path);
-            using (var stream = File.OpenText(path))
+            if (Path.GetExtension(path) == string.Empty && Directory.Exists(path))
             {
-                string savedFileName = Prolog.CurrentSourceFile;
-                int savedLineNumber = Prolog.CurrentSourceLineNumber;
-                try
+                foreach (var file in Directory.GetFiles(Prolog.LoadDirectoryPath(path)))
+                    if (IsSourceFile(file))
+                        Reconsult(file);
+            }
+            else
+            {
+                path = Prolog.LoadFilePath(path);
+                using (var stream = File.OpenText(path))
                 {
-                    Prolog.CurrentSourceFile = path;
-                    Prolog.CurrentSourceLineNumber = 0;
-                    Reconsult(new PositionTrackingTextReader(stream, path));
-                }
-                finally
-                {
-                    Prolog.CurrentSourceFile = savedFileName;
-                    Prolog.CurrentSourceLineNumber = savedLineNumber;
+                    string savedFileName = Prolog.CurrentSourceFile;
+                    int savedLineNumber = Prolog.CurrentSourceLineNumber;
+                    try
+                    {
+                        Prolog.CurrentSourceFile = path;
+                        Prolog.CurrentSourceLineNumber = 0;
+                        Reconsult(new PositionTrackingTextReader(stream, path));
+                    }
+                    finally
+                    {
+                        Prolog.CurrentSourceFile = savedFileName;
+                        Prolog.CurrentSourceLineNumber = savedLineNumber;
+                    }
                 }
             }
         }
@@ -760,33 +769,48 @@ namespace Prolog
         /// </summary>
         public void Consult(string path)
         {
-            path = DefaultExtension(Prolog.LoadFilePath(path), ".prolog");
-
-            using (var stream = File.OpenText(path))
+            var directoryPath = Prolog.LoadDirectoryPath(path);
+            if (Path.GetExtension(directoryPath) == string.Empty && Directory.Exists(directoryPath))
             {
-                string savedFileName = Prolog.CurrentSourceFile;
-                int savedLineNumber = Prolog.CurrentSourceLineNumber;
-                try
+                foreach (var file in Directory.GetFiles(directoryPath))
+                    if (IsSourceFile(file))
+                        Consult(file);
+            }
+            else
+            {
+                path = DefaultExtension(Prolog.LoadFilePath(path), ".prolog");
+
+                using (var stream = File.OpenText(path))
                 {
-                    Prolog.CurrentSourceFile = path;
-                    Prolog.CurrentSourceLineNumber = 0;
-                    var textReader = new PositionTrackingTextReader(stream, path);
-                    if (Path.GetExtension(path) == ".csv")
+                    string savedFileName = Prolog.CurrentSourceFile;
+                    int savedLineNumber = Prolog.CurrentSourceLineNumber;
+                    try
                     {
-                        var functor = Symbol.Intern(Path.GetFileNameWithoutExtension(path));
-                        this.IsTrue(new Structure("begin_csv_loading", functor));  // Ignore return value
-                        new CSVParser(functor, ',', textReader).Read(this.LoadCSVRow);
-                        this.IsTrue(new Structure("end_csv_loading", functor));    // Ignore return value
+                        Prolog.CurrentSourceFile = path;
+                        Prolog.CurrentSourceLineNumber = 0;
+                        var textReader = new PositionTrackingTextReader(stream, path);
+                        if (Path.GetExtension(path) == ".csv")
+                        {
+                            var functor = Symbol.Intern(Path.GetFileNameWithoutExtension(path));
+                            this.IsTrue(new Structure("begin_csv_loading", functor)); // Ignore return value
+                            new CSVParser(functor, ',', textReader).Read(this.LoadCSVRow);
+                            this.IsTrue(new Structure("end_csv_loading", functor)); // Ignore return value
+                        }
+                        else
+                            Consult(textReader);
                     }
-                    else
-                        Consult(textReader);
-                }
-                finally
-                {
-                    Prolog.CurrentSourceFile = savedFileName;
-                    Prolog.CurrentSourceLineNumber = savedLineNumber;
+                    finally
+                    {
+                        Prolog.CurrentSourceFile = savedFileName;
+                        Prolog.CurrentSourceLineNumber = savedLineNumber;
+                    }
                 }
             }
+        }
+
+        private static bool IsSourceFile(string file)
+        {
+            return file.EndsWith(".prolog") || file.EndsWith(".csv");
         }
 
         // ReSharper disable once InconsistentNaming

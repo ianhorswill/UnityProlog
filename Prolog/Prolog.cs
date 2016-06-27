@@ -65,13 +65,29 @@ namespace Prolog
         /// <summary>
         /// Converts English text string to Prolog-format list of words (symbols).
         /// </summary>
-        public static Structure StringToWordList(string text)
+        public static Structure StringToWordList(string text, bool allowUnquote = false, List<LogicVariable> vars = null)
         {
             var b = new StringBuilder();
             var words = new List<object>();
+            bool unquoted = false;
 
             foreach (var c in text)
             {
+                if (unquoted)
+                {
+                    b.Append(c);
+                    if (c == ']')
+                    {
+                        b.Append('.');
+                        var s = b.ToString();
+                        if (vars == null)
+                            vars = new List<LogicVariable>();
+                        words.Add(new ISOPrologReader(s, vars).ReadTermWithExistingVars());
+                        b.Length = 0;
+                        unquoted = false;
+                    }
+                }
+                else
                 switch (c)
                 {
                     case ' ':
@@ -89,6 +105,8 @@ namespace Prolog
                     case '?':
                     case '(':
                     case ')':
+                    case '[':
+                    case ']':
                     case '\'':
                     case '"':
                         if (b.Length > 0)
@@ -96,8 +114,15 @@ namespace Prolog
                             words.Add(GetLexicalItem(b.ToString()));
                             b.Length = 0;
                         }
-                        words.Add(GetLexicalItem(new string(c, 1)));
+                        if (c == '[' && allowUnquote)
+                        {
+                            b.Append(c);
+                            unquoted = true;
+                        }
+                        else
+                            words.Add(GetLexicalItem(new string(c, 1)));
                         break;
+
 
                     default:
                         b.Append(c);
@@ -329,6 +354,16 @@ namespace Prolog
         {
             if (Path.GetExtension(path) == string.Empty)
                 path = path + DefaultSourceFileExtension;
+            return Path.Combine(Application.dataPath, path);
+        }
+
+        /// <summary>
+        /// Returns the full pathname of the specified directory.
+        /// </summary>
+        /// <param name="path">Path within the application directory</param>
+        /// <returns>Full pathname</returns>
+        internal static string LoadDirectoryPath(string path)
+        {
             return Path.Combine(Application.dataPath, path);
         }
 

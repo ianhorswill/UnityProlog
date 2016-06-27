@@ -24,6 +24,7 @@
 #endregion
 
 using System;
+using System.CodeDom;
 using System.Collections.Generic;
 using System.IO;
 
@@ -65,13 +66,19 @@ namespace Prolog
         }
 
         #region Constructors
-        public ISOPrologReader(TextReader input)
+
+        public ISOPrologReader(TextReader input) : this(input, new List<LogicVariable>())
+        {
+        }
+
+        public ISOPrologReader(TextReader input,  List<LogicVariable> vars)
         {
             inputReader = input;
-
+            Variables = vars;
         }
 
         public ISOPrologReader(string input) : this(new StringReader(input)) {}
+        public ISOPrologReader(string input, List<LogicVariable> vars) : this(new StringReader(input), vars) { }
 
         static ISOPrologReader()
         {
@@ -1979,7 +1986,7 @@ namespace Prolog
 
         private StackFrame pStack;
 
-        private readonly List<LogicVariable> vars = new List<LogicVariable>();
+        public readonly List<LogicVariable> Variables;
         /* variable management ; all correctly parsed variable names are put
            in a list to be used later to return the variables names to the
            options of read_term/3 */
@@ -1987,7 +1994,7 @@ namespace Prolog
         private void initvars()
             /* initialize variable list */
         {
-            vars.Clear();
+            Variables.Clear();
         }
 
         private void reduce(int newpri)
@@ -2137,6 +2144,19 @@ namespace Prolog
                             pStack.tokentype = TERMTYPE;
                             goto reduce;
                         }
+                    }
+                    else if (top2.term == Symbol.DollarSign && Structure.IsFunctor(top1.term, Symbol.Text, 1))
+                    {
+                        var arg = ((Structure)top1.term).Arguments[0];
+                        var str = arg as string;
+                        if (str == null)
+                            throw new SyntaxErrorException(arg, "Invalid $- expression; should be a string.");
+                        top2.term = Prolog.StringToWordList(str, true, Variables);
+                        //BFREE(top1);
+                        pStack = top2;
+                        pStack.specifier = LTERM;
+                        pStack.tokentype = TERMTYPE;
+                        goto reduce;
                     }
                         // Kluge to handle Twig's $ operator but still allow legacy code to redefine it.
                     else if (top2.term==Symbol.DollarSign && (top1.term is Symbol || top1.term is string))
@@ -2309,12 +2329,12 @@ namespace Prolog
                 case VARIABLE_TOKEN:
                     string name = this.TokenString;
                     // Look for existing variable if name doesn't start with underscore
-                    var lv = (name[0] == '_')?null:vars.Find(v => v.Name.Name == name);
+                    var lv = (name[0] == '_')?null:Variables.Find(v => v.Name.Name == name);
                     if (lv == null)
                     {
                         // Anonymous or otherwise new variable
                         lv = new LogicVariable(Symbol.Intern(name));
-                        vars.Add(lv);
+                        Variables.Add(lv);
                     }
                     shift(VARIABLE_TOKEN, lv, 0, TERM);
                     break;
@@ -2410,7 +2430,7 @@ namespace Prolog
             var r = new ISOPrologReader(exp);
             var term = r.ReadTerm();
             variables.Clear();
-            variables.AddRange(r.vars);
+            variables.AddRange(r.Variables);
             return term;
         }
 
@@ -2423,7 +2443,13 @@ namespace Prolog
             return terms;
         }
 
-        public Object ReadTerm()
+        public object ReadTerm()
+        {
+            initvars();
+            return ReadTermWithExistingVars();
+        }
+
+        public Object ReadTermWithExistingVars()
             /*
      * this procedure reads tokens and puts them on the stack
      * until it read either eof or end token. If one term is
@@ -2432,7 +2458,6 @@ namespace Prolog
         {
             int tok;
             pStack = null;
-            initvars();
             parseerror = ERR_NOERROR;
             do
             {
