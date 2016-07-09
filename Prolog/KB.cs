@@ -120,5 +120,16 @@ namespace Prolog
                 throw;
             }
         }
+
+        /// <summary>
+        /// Call prolog query specified by string.
+        /// Provided as UI glue.
+        /// </summary>
+        /// <param name="prologCode">Source code for Prolog query</param>
+        public void Run(string prologCode)
+        {
+            var code = prologCode.EndsWith(".") ? prologCode : prologCode + '.';
+            kb.IsTrue(ISOPrologReader.Read(code));
+        }
     }
 }
