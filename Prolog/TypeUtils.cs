@@ -47,6 +47,7 @@ namespace Prolog
                                                            "{0}, Assembly-Boo",
                                                            "Prolog.{0}, Prolog",
                                                            "UnityEngine.{0}, UnityEngine",
+                                                           "UnityEngine.UI.{0}, UnityEngine.UI",
                                                            "System.{0}"
                                                        };
 
