@@ -225,9 +225,14 @@ namespace Prolog
                                 }
                             }
                         }
+                        if (type == null)
+                            throw new InvalidOperationException("Unknown type: "+o);
                         if (!type.IsSubclassOf(typeof(Component)))
                             throw new ArgumentException("Component type specified is not a Component type"+type.Name);
-                        return go.GetComponent(type);
+                        var component = go.GetComponent(type);
+                        if (component == null)
+                            throw new InvalidOperationException("GameObject "+go+" contains no component of type "+type);
+                        return component;
                     }
 
                 case "property":
