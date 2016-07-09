@@ -418,6 +418,8 @@ namespace Prolog
                 "Parses/unparses STRING into a LIST of word.", "?string", "?list");
             DefinePrimitive("quasiquote_parse", QuasiquoteParseImplementation, "definite clause grammars",
                 "LIST is the parse of the quasiquoted STRING, and sharing any variables appearing in TERM.", "+string", "+term" ,"?list");
+            DefinePrimitive("capitalized", CapitalizedImplementation, "other predicates",
+                "Capitalized is identical to STRING but with the first letter capitalized.", "+string", "?capitalized");
             DefinePrimitive("register_lexical_item", RegisterLexicalItemImplementation, "definite clause grammars",
                 "Adds WORD to list of words recognized by word_list.", "+word");
             DefinePrimitive("string_representation", StringRepresentationImplementation, "other predicates",
@@ -1554,8 +1556,8 @@ namespace Prolog
         private static IEnumerable<CutState> SetPropertyImplementation(object[] args, PrologContext context)
         {
             if (args.Length != 3)
-                throw new ArgumentCountException("set_property", args, "object", "property_name", "new_value");
-            object objectArg = Term.Deref(args[0]);
+                throw new ArgumentCountException("set_property", args, "objectExpression", "property_name", "new_value");
+            object objectArg = FunctionalExpression.Eval(args[0], context);
             if (objectArg is LogicVariable)
                 throw new UninstantiatedVariableException((LogicVariable) args[0],
                     "First argument of property/3 must be instantiated to an object from which to get the property value.");
@@ -2892,6 +2894,19 @@ namespace Prolog
                     foreach (var arg in s.Arguments)
                         FindVarsWalk(arg, vars);
             }
+        }
+
+        private static IEnumerable<CutState> CapitalizedImplementation(object[] args, PrologContext context)
+        {
+            if (args.Length != 2) throw new ArgumentCountException("capitalized", args, "string", "capitalized");
+            object arg0 = Term.Deref(args[0]);
+            var s = arg0 as string;
+            if (s == null)
+            {
+                throw new ArgumentException(
+                    "First argument must be a string.");
+            }
+            return Term.UnifyAndReturnCutState(char.ToUpper(s[0])+s.Substring(1), args[1]);
         }
 
         private static IEnumerable<CutState> RegisterLexicalItemImplementation(object[] args, PrologContext context)
