@@ -232,13 +232,18 @@ namespace Prolog
 
         internal void PrintWarning(string formatString, params object[] formatArgs)
         {
+#if DisableUnity
+            Console.Write("{0} (at {1}:{2}): ", 
+                ISOPrologWriter.WriteToString(this.Head), this.SourceFile, this.SourceLineNumber);
+            Console.WriteLine(formatString, formatArgs);
+#else
             //Repl.StartWarnings();
             Debug.LogException(
                 new PrologWarning(string.Format(formatString, formatArgs),
                 string.Format("{0} (at {1}:{2})\n", ISOPrologWriter.WriteToString(this.Head), this.SourceFile, this.SourceLineNumber))
                 );
-            //Console.Write(" in predicate {0}:{1}/{2}.", kb.Name, HeadFunctor, HeadArity);
-            
+#endif
+
         }
 
         public override string ToString()

@@ -30,71 +30,12 @@ using System.Diagnostics;
 namespace Prolog
 {
     /// <summary>
-    /// Used to extend unification mechanism for constraint processing.
-    /// Currently, only subclass is Suspension, which is used by dif/2 and freeze/2.
-    /// </summary>
-    abstract class Metastructure
-    {
-        #region Iterator-based unification
-        /// <summary>
-        /// Merge the information from two Metastructures into one new metastructure.
-        /// </summary>
-        /// <param name="value">The Metastructure to merge with.</param>
-        /// <param name="filter">Test for whether the merging succeeded.  Generally a woken goal.</param>
-        /// <returns>The merged Metastructure.</returns>
-        public abstract Metastructure MetaMetaUnify(Metastructure value, out IEnumerable<CutState> filter);
-
-        /// <summary>
-        /// Called after the variable bound to this Metastructure is unified with an unbound variable
-        /// that is not (itself) bound to a Metastructure.
-        /// </summary>
-        /// <param name="them">The logic variable with which to unify</param>
-        /// <param name="filter">Test for whether the merging succeeded.  Generally a woken goal.</param>
-        /// <returns>The Metastructure to bind to the newly aliased variables.</returns>
-        public abstract Metastructure MetaVarUnify(LogicVariable them, out IEnumerable<CutState> filter);
-
-        /// <summary>
-        /// Called after the variable bound to this Metastructure is unified with a non-variable term.
-        /// </summary>
-        /// <param name="value">The term to which to unify.</param>
-        /// <returns>Iterator for any suspended goals.</returns>
-        public abstract IEnumerable<CutState> MetaTermUnify(object value);
-        #endregion
-
-        #region Trail-based unification
-        /// <summary>
-        /// Merge the information from two Metastructures into one new metastructure.
-        /// </summary>
-        /// <param name="theirMetaStructure">The Metastructure to merge with.</param>
-        /// <param name="context">Context in which to execute suspended goals.</param>
-        /// <returns>The merged Metastructure.</returns>
-        public abstract Metastructure MetaMetaUnify(Metastructure theirMetaStructure, PrologContext context);
-
-        /// <summary>
-        /// Called after the variable bound to this Metastructure is unified with an unbound variable
-        /// that is not (itself) bound to a Metastructure.
-        /// </summary>
-        /// <param name="l">The logic variable with which to Unify.</param>
-        /// <param name="context">Context in which to execute suspended goals.</param>
-        /// <returns>The Metastructure to bind to the newly aliased variables.</returns>
-        public abstract Metastructure MetaVarUnify(LogicVariable l, PrologContext context);
-
-        /// <summary>
-        /// Called after the variable bound to this Metastructure is unified with a non-variable term.
-        /// </summary>
-        /// <param name="value">The term to which to unify</param>
-        /// <param name="context">Context in which to execute suspended goals.</param>
-        public abstract void MetaTermUnify(object value, PrologContext context);
-        #endregion
-    }
-
-    /// <summary>
     /// Used to hold suspended goals for dif/2 and freeze/2.
     /// Suspended goals are run when the logic variable to which this Suspension is bound is unified.
     /// Delayed goals run on any unification, frozen only on unification with non-variable terms.
     /// </summary>
     [DebuggerDisplay("{DebuggerDisplay}")]
-    sealed class Suspension : Metastructure
+    sealed class Metastructure
     {
         /// <summary>
         /// Create a new set of suspended goals.
@@ -102,12 +43,18 @@ namespace Prolog
         /// <param name="delayedGoal">Goal to run upon unification with any value.</param>
         /// <param name="frozenGoal">Goal to run upon unification with a non-variable term.</param>
         /// <param name="prologContext">Context in which to run goals.</param>
-        public Suspension(Structure delayedGoal, Structure frozenGoal, PrologContext prologContext)
+        public Metastructure(Structure delayedGoal, Structure frozenGoal, PrologContext prologContext)
         {
             DelayedGoal = delayedGoal;
             FrozenGoal = frozenGoal;
             Context = prologContext;
         }
+
+        public Metastructure(Structure delayedGoal, Structure frozenGoal, PrologContext prologContext, Metastructure old) :
+            this(CombineGoals(delayedGoal, old?.DelayedGoal),
+                 CombineGoals(frozenGoal, old?.FrozenGoal),
+                 prologContext)
+        { }
 
         /// <summary>
         /// Frozen goal - only runs when variable is bound to a value, but not when aliased to another
@@ -133,14 +80,13 @@ namespace Prolog
         /// <param name="value">The Metastructure to merge with.</param>
         /// <param name="filter">Test for whether the merging succeeded.  Generally a woken goal.</param>
         /// <returns>The merged Metastructure.</returns>
-        public override Metastructure MetaMetaUnify(Metastructure value, out IEnumerable<CutState> filter)
+        public Metastructure MetaMetaUnify(Metastructure value, out IEnumerable<CutState> filter)
         {
-            var s = value as Suspension;
-            if (s == null) throw new ArgumentTypeException("MetaMetaUnify", "value", value, typeof(Suspension));
-            if (Context != s.Context) throw new ArgumentException("Can't unify suspended goals across PrologContexts.");
+            if (value == null) throw new ArgumentTypeException("MetaMetaUnify", "value", value, typeof(Metastructure));
+            if (Context != value.Context) throw new ArgumentException("Can't unify suspended goals across PrologContexts.");
             
-            filter = Prover(CombineGoals(DelayedGoal, s.DelayedGoal));
-            return MakeSuspension(null, CombineGoals(FrozenGoal, s.FrozenGoal));
+            filter = Prover(CombineGoals(DelayedGoal, value.DelayedGoal));
+            return MakeSuspension(null, CombineGoals(FrozenGoal, value.FrozenGoal));
         }
 
         /// <summary>
@@ -150,7 +96,7 @@ namespace Prolog
         /// <param name="them">The logic variable with which to unify</param>
         /// <param name="filter">Test for whether the merging succeeded.  Generally a woken goal.</param>
         /// <returns>The Metastructure to bind to the newly aliased variables.</returns>
-        public override Metastructure MetaVarUnify(LogicVariable them, out IEnumerable<CutState> filter)
+        public Metastructure MetaVarUnify(LogicVariable them, out IEnumerable<CutState> filter)
         {
             filter = Prover(DelayedGoal);
             return MakeSuspension(null, FrozenGoal);
@@ -161,7 +107,7 @@ namespace Prolog
         /// </summary>
         /// <param name="value">The term to which to unify.</param>
         /// <returns>Iterator for any suspended goals.</returns>
-        public override IEnumerable<CutState> MetaTermUnify(object value)
+        public IEnumerable<CutState> MetaTermUnify(object value)
         {
             return Prover(CombineGoals(DelayedGoal, FrozenGoal));
         }
@@ -174,14 +120,13 @@ namespace Prolog
         /// <param name="theirMetaStructure">The Metastructure to merge with.</param>
         /// <param name="context">Context in which to execute suspended goals.</param>
         /// <returns>The merged Metastructure.</returns>
-        public override Metastructure MetaMetaUnify(Metastructure theirMetaStructure, PrologContext context)
+        public Metastructure MetaMetaUnify(Metastructure theirMetaStructure, PrologContext context)
         {
-            var s = theirMetaStructure as Suspension;
-            if (s == null) throw new ArgumentTypeException("MetaMetaUnify", "theirMetaStructure", theirMetaStructure, typeof(Suspension));
-            if (context != s.Context) throw new ArgumentException("Can't unify suspended goals across PrologContexts.");
+            if (theirMetaStructure == null) throw new ArgumentTypeException("MetaMetaUnify", "theirMetaStructure", theirMetaStructure, typeof(Metastructure));
+            if (context != theirMetaStructure.Context) throw new ArgumentException("Can't unify suspended goals across PrologContexts.");
 
-            context.WakeUpGoal(CombineGoals(DelayedGoal, s.DelayedGoal));
-            return MakeSuspension(null, CombineGoals(FrozenGoal, s.FrozenGoal));
+            context.WakeUpGoal(CombineGoals(DelayedGoal, theirMetaStructure.DelayedGoal));
+            return MakeSuspension(null, CombineGoals(FrozenGoal, theirMetaStructure.FrozenGoal));
         }
 
         /// <summary>
@@ -191,7 +136,7 @@ namespace Prolog
         /// <param name="l">The logic variable with which to Unify.</param>
         /// <param name="context">Context in which to execute suspended goals.</param>
         /// <returns>The Metastructure to bind to the newly aliased variables.</returns>
-        public override Metastructure MetaVarUnify(LogicVariable l, PrologContext context)
+        public Metastructure MetaVarUnify(LogicVariable l, PrologContext context)
         {
             if (DelayedGoal != null)
                 context.WakeUpGoal(DelayedGoal);
@@ -203,7 +148,7 @@ namespace Prolog
         /// </summary>
         /// <param name="value">The term to which to unify</param>
         /// <param name="contextOfBinding">Context in which to execute suspended goals.</param>
-        public override void MetaTermUnify(object value, PrologContext contextOfBinding)
+        public void MetaTermUnify(object value, PrologContext contextOfBinding)
         {
             Debug.Assert(contextOfBinding == Context, "Delayed goal woken in a different context than it was created in.");
             contextOfBinding.WakeUpGoal(CombineGoals(DelayedGoal, FrozenGoal));
@@ -218,11 +163,11 @@ namespace Prolog
             return Context.Prove(goal);
         }
 
-        Suspension MakeSuspension(Structure delayed, Structure frozen)
+        Metastructure MakeSuspension(Structure delayed, Structure frozen)
         {
             if (delayed == null && frozen == null)
                 return null;
-            return new Suspension(delayed, frozen, Context);
+            return new Metastructure(delayed, frozen, Context);
         }
 
         static Structure CombineGoals(Structure goal1, Structure goal2)

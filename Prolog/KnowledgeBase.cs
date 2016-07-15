@@ -885,8 +885,10 @@ namespace Prolog
                 }
                 catch (Exception e)
                 {
+#if !DisableUnity
                     Debug.LogException(e);
                     Repl.RecordExceptionSourceLocation(e, lastLine);
+#endif
                     throw new PrologError(
                         e,
                         context.StackTrace(Prolog.CurrentSourceFile, Prolog.CurrentSourceLineNumber, "consult/1", false));
@@ -942,9 +944,9 @@ namespace Prolog
                 Reconsult(path);
             }
         }
-        #endregion
+#endregion
 
-        #region Source regeneration - listing out of all entries in the DB.
+#region Source regeneration - listing out of all entries in the DB.
         /// <summary>
         /// All assertions in the database
         /// </summary>
@@ -1039,6 +1041,6 @@ namespace Prolog
             }
         }
 
-        #endregion
+#endregion
     }
 }

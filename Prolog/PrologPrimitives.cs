@@ -855,7 +855,7 @@ namespace Prolog
                 // Variable is already instantiated - run the goal
                 return context.Prove(goal);
             // Variable is uninstantiated; tag it with a suspension of goal.
-            return canonv.MetaUnify(new Suspension(null, goal, context));
+            return canonv.AddFrozenGoal(goal, context);
         }
 
         private static IEnumerable<CutState> FrozenImplementation(object[] args, PrologContext context)
@@ -863,9 +863,9 @@ namespace Prolog
             if (args.Length != 2) throw new ArgumentCountException("frozen", args, "@variable", "-goal");
             var variable = Term.Deref(args[0]) as LogicVariable;
             object goal = Symbol.True;
-            if (variable != null && variable.MetaBinding is Suspension)
+            if (variable != null && variable.MetaBinding != null)
             {
-                var suspension = variable.MetaBinding as Suspension;
+                var suspension = variable.MetaBinding;
                 if (suspension.FrozenGoal != null)
                     goal = suspension.FrozenGoal;
             }
@@ -885,7 +885,7 @@ namespace Prolog
                     // The terms are already equal
                     return CutStateSequencer.Fail();
                 // Unifying them would require binding a variable; delay this call to Dif on that variable.
-                return vars[0].MetaUnify(new Suspension(new Structure(SDif, args), null, context));
+                return vars[0].AddSuspendedGoal(new Structure(SDif, args), context);
             }
             // Nothing can make these terms equal
             return CutStateSequencer.Succeed();

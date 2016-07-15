@@ -256,6 +256,35 @@ namespace Prolog
         #endregion
 
         #region Iterator-based unification
+        internal IEnumerable<CutState> AddFrozenGoal(Structure goal, PrologContext context)
+        {
+            var old = MetaBinding;
+            mValue = new Metastructure(null, goal, context, old);
+            try
+            {
+                yield return CutState.Continue;
+            }
+            finally
+            {
+                mValue = old;
+            }
+
+        }
+
+        internal IEnumerable<CutState> AddSuspendedGoal(Structure goal, PrologContext context)
+        {
+            var old = MetaBinding;
+            mValue = new Metastructure(goal, null, context, old);
+            try
+            {
+                yield return CutState.Continue;
+            }
+            finally
+            {
+                mValue = old;
+            }
+
+        }
         internal IEnumerable<bool> UnifyWithCanonicalValue(object value)
         {
             if (!IsBound)
@@ -315,7 +344,8 @@ namespace Prolog
         IEnumerable<bool> UnifyMetaMeta(Metastructure myMetaStructure, Metastructure theirMetaStructure, LogicVariable them)
         {
             IEnumerable<CutState> filter;
-            mValue = myMetaStructure.MetaMetaUnify(theirMetaStructure, out filter);
+            object mergedMetaValue = myMetaStructure.MetaMetaUnify(theirMetaStructure, out filter);
+            mValue = mergedMetaValue??this;
             them.Value = this;
 #pragma warning disable 414, 168, 219
             // ReSharper disable UnusedVariable
@@ -333,7 +363,7 @@ namespace Prolog
             Debug.Assert(l.MetaBinding == null);
             l.Value = this;
             IEnumerable<CutState> goal;
-            mValue = m.MetaVarUnify(l, out goal);
+            mValue = (object)m.MetaVarUnify(l, out goal)??this;
             try
             {
 #pragma warning disable 414, 168, 219
@@ -399,7 +429,22 @@ namespace Prolog
             if (IsBound) throw new InvalidOperationException("Cannot meta-unify a bound variable");
             Metastructure old = MetaBinding;
             IEnumerable<CutState> filter = null;
-            mValue = old != null ? old.MetaMetaUnify(m, out filter) : m;
+            if (old != null)
+            {
+                var merged = old.MetaMetaUnify(m, out filter);
+                if (merged != null)
+                    mValue = merged;
+                else
+                    // All we have a suspended goal, which is now in the filter
+                    // there's no frozen goal, so we just unbind the variable
+                    // and see what the filter does.
+                    mValue = this;
+            }
+            else
+            {
+                mValue = m;
+            }
+
             try
             {
                 if (filter != null)

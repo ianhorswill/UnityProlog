@@ -546,28 +546,36 @@ namespace Prolog
 
         void LowLevelWrite(object x)
         {
-            var g = x as GameObject;
-            if (g != null)
+            if (x == null)
+                output.Write("null");
+            else
             {
-                output.Write('$');
-                if (g.name.IndexOf(' ') >= 0 || !char.IsLower(g.name[0]))
+#if !DisableUnity
+                var g = x as GameObject;
+                if (g != null)
                 {
-                    output.Write('\'');
-                    output.Write(g.name);
-                    output.Write('\'');
+                    output.Write('$');
+                    if (g.name.IndexOf(' ') >= 0 || !char.IsLower(g.name[0]))
+                    {
+                        output.Write('\'');
+                        output.Write(g.name);
+                        output.Write('\'');
+                    }
+                    else
+                        output.Write(g.name);
+                }
+                else 
+#endif
+                if (x is string)
+                {
+                    output.Write('"');
+                    output.Write(x);
+                    output.Write('"');
                 }
                 else
-                    output.Write(g.name);
+                    output.Write(x ?? "null");
+                lastChar = '1';
             }
-            else if (x is string)
-            {
-                output.Write('"');
-                output.Write(x);
-                output.Write('"');
-            }
-            else
-                output.Write(x ?? "null");
-            lastChar = '1';
         }
     }
 }

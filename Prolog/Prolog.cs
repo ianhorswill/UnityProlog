@@ -354,7 +354,11 @@ namespace Prolog
         {
             if (Path.GetExtension(path) == string.Empty)
                 path = path + DefaultSourceFileExtension;
+#if DisableUnity
+            return path;
+#else
             return Path.Combine(Application.dataPath, path);
+#endif
         }
 
         /// <summary>
@@ -364,7 +368,11 @@ namespace Prolog
         /// <returns>Full pathname</returns>
         internal static string LoadDirectoryPath(string path)
         {
+#if DisableUnity
+            return path;
+#else
             return Path.Combine(Application.dataPath, path);
+#endif
         }
 
         /// <summary>
