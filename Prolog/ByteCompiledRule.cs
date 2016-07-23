@@ -206,7 +206,7 @@ namespace Prolog
         #region Interpreter
         internal IEnumerable<CutState> StackCall(PrologContext context)
         {
-            int traceMark = context.MarkTrace();
+            int traceMark = context.MarkTrail();
             // On entry, the stack pointer points at the base of our arguments.
             int framePointer = context.MakeFrame(frameSize);
             ushort pc = 0;

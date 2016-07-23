@@ -165,7 +165,7 @@ namespace Prolog
 
         private IEnumerable<CutState> EnumerateArg2Driver(T1 arg1, LogicVariable arg2, PrologContext context)
         {
-            int tracePointer = context.MarkTrace();
+            int tracePointer = context.MarkTrail();
             foreach (var newValue in arg2Enumerator(arg1))
             {
                 arg2.UnifyWithAtomicConstant(newValue, context);
@@ -178,7 +178,7 @@ namespace Prolog
 
         private IEnumerable<CutState> EnumerateArg1Driver(LogicVariable arg1, T2 arg2, PrologContext context)
         {
-            int tracePointer = context.MarkTrace();
+            int tracePointer = context.MarkTrail();
             foreach (var newValue in arg1Enumerator(arg2))
             {
                 arg1.UnifyWithAtomicConstant(newValue, context);
@@ -191,7 +191,7 @@ namespace Prolog
 
         private IEnumerable<CutState> EnumerateBothDriver(LogicVariable arg1, LogicVariable arg2, PrologContext context)
         {
-            int tracePointer = context.MarkTrace();
+            int tracePointer = context.MarkTrail();
             foreach (var pair in doubleEnumerator())
             {
                 arg1.UnifyWithAtomicConstant(pair.Arg1, context);

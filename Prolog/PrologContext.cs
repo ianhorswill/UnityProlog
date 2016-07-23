@@ -107,9 +107,9 @@ namespace Prolog
             goalStackCurrentRules = new List<KnowledgeBaseEntry>();
             GoalStackDepth = 0;
             KnowledgeBase = kb;
-            traceVariables = new LogicVariable[256];
-            traceValues = new object[256];
-            tracePointer = 0;
+            trailVariables = new LogicVariable[256];
+            trailValues = new object[256];
+            trailPointer = 0;
             IndexicalBindingStack = new List<KeyValuePair<Symbol, object>>();
             isFree = true;
         }
@@ -518,55 +518,55 @@ namespace Prolog
 
         #endregion
 
-        #region Trace (undo stack) operations
+        #region Trail (undo stack) operations
         /// <summary>
         /// The position in the trace where the next spilled variable will be stored.
         /// </summary>
-        private int tracePointer;
+        private int trailPointer;
 
-        private LogicVariable[] traceVariables;
-        private object[] traceValues;
+        private LogicVariable[] trailVariables;
+        private object[] trailValues;
 
         /// <summary>
-        /// Saves the current value of a variable on the trace (i.e. the undo stack).
+        /// Saves the current value of a variable on the trail (i.e. the undo stack).
         /// </summary>
         public void SaveVariable(LogicVariable lvar)
         {
-            if (tracePointer==traceVariables.Length)
+            if (trailPointer==trailVariables.Length)
             {
-                var newTraceVariables = new LogicVariable[traceVariables.Length*2];
-                var newTraceValues = new object[traceVariables.Length*2];
-                traceVariables.CopyTo(newTraceVariables, 0);
-                traceValues.CopyTo(newTraceValues, 0);
-                traceVariables = newTraceVariables;
-                traceValues = newTraceValues;
+                var newTraceVariables = new LogicVariable[trailVariables.Length*2];
+                var newTraceValues = new object[trailVariables.Length*2];
+                trailVariables.CopyTo(newTraceVariables, 0);
+                trailValues.CopyTo(newTraceValues, 0);
+                trailVariables = newTraceVariables;
+                trailValues = newTraceValues;
             }
-            traceVariables[tracePointer] = lvar;
-            traceValues[tracePointer] = lvar.mValue;
-            tracePointer++;
+            trailVariables[trailPointer] = lvar;
+            trailValues[trailPointer] = lvar.mValue;
+            trailPointer++;
         }
 
         /// <summary>
         /// Restores the values of all variables back to the specified position on the trace (i.e. the undo stack).
         /// </summary>
-        public void RestoreVariables(int savedTracePointer)
+        public void RestoreVariables(int savedTrailPointer)
         {
-            AbortWokenGoals(savedTracePointer);
-            while (tracePointer != savedTracePointer)
+            AbortWokenGoals(savedTrailPointer);
+            while (trailPointer != savedTrailPointer)
             {
-                tracePointer--;
-                traceVariables[tracePointer].mValue = traceValues[tracePointer];
+                trailPointer--;
+                trailVariables[trailPointer].mValue = trailValues[trailPointer];
             }
         }
 
         /// <summary>
-        /// Marks a place on the trace so subsequent bindings can be undone.
+        /// Marks a place on the trail so subsequent bindings can be undone.
         /// Present implementation does not actually modify the stack in any way.
         /// </summary>
         /// <returns></returns>
-        public int MarkTrace()
+        public int MarkTrail()
         {
-            return tracePointer;
+            return trailPointer;
         }
         #endregion
 
@@ -671,7 +671,7 @@ namespace Prolog
         {
             if (wokenStack == null)
                 wokenStack = new Stack<WokenGoal>();
-            wokenStack.Push(new WokenGoal { TracePointer = tracePointer, Goal = goal});
+            wokenStack.Push(new WokenGoal { TracePointer = trailPointer, Goal = goal});
         }
 
         void AbortWokenGoals(int newTracePointer)

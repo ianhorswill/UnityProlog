@@ -37,7 +37,13 @@ test(freeze(composition_of_frozen_goals),
    A = B,
    A = 1.
 
-test(freeze(dif_nothing)) :-
+test(freeze(dif0)) :-
+   dif().
+
+test(freeze(dif1)) :-
+   dif(_).
+
+test(freeze(dif2_completion)) :-
    dif(_, _).
 
 test(freeze(dif_vars_are_different)) :-
@@ -80,3 +86,21 @@ test(freeze(meta_meta_unify)) :-
 test(freeze(dif_transitive_equation),
      [ true((var(A), var(B), var(C)))]) :-
    dif(A,B), dif(B,C), A=C.
+
+test(freeze(dif3_completion)) :-
+   dif(_, _, _).
+
+test(freeze(dif3_succeed)) :-
+   dif(A, B, C), A=1, B=2, C=3.
+
+test(freeze(dif3_fail)) :-
+   \+ (dif(A, B, C), A=1, B=2, C=1).
+
+test(freeze(dif3:solutions),
+     true(L == [1:2:3, 1:3:2, 2:1:3, 2:3:1, 3:1:2, 3:2:1])) :-
+   all(A:B:C,
+       ( dif(A, B, C),
+	 member(A, [1,2,3]),
+	 member(B, [1, 2, 3]),
+	 member(C, [1, 2, 3]) ),
+       L).

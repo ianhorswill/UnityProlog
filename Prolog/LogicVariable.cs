@@ -137,7 +137,7 @@ namespace Prolog
         // ReSharper restore InconsistentNaming
         #endregion
 
-        #region Trace-based Unification
+        #region Trail-based Unification
         /// <summary>
         /// Saves variable to the trail and updates it.
         /// </summary>
@@ -145,6 +145,11 @@ namespace Prolog
         {
             context.SaveVariable(this);
             mValue = value;
+        }
+
+        public void AddSuspendedGoalSavingToTrail(Structure goal, PrologContext context)
+        {
+            SaveAndUpdate(new Metastructure(goal, null, context, MetaBinding), context);
         }
 
         internal bool UnifyWithCanonicalValue(object value, PrologContext context)
@@ -281,10 +286,10 @@ namespace Prolog
             }
             finally
             {
-                mValue = old;
+                mValue = (object)old??this;
             }
-
         }
+
         internal IEnumerable<bool> UnifyWithCanonicalValue(object value)
         {
             if (!IsBound)

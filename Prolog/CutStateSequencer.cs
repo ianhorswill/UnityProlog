@@ -49,6 +49,20 @@ namespace Prolog
             return FromBoolean(true);
         }
 
+
+        public static IEnumerable<CutState> SucceedAndRestoreTrail(PrologContext context, int trailMark)
+        {
+            try
+            {
+                yield return CutState.Continue;
+            }
+            finally
+            {
+                context.RestoreVariables(trailMark);
+            }
+
+        }
+
         /// <summary>
         /// Returns a sequencer that fails.
         /// </summary>

@@ -169,7 +169,7 @@ namespace Prolog
         /// </summary>
         IEnumerable<CutState> TestClausesInOrder(object[] args, PrologContext context, ushort myFrame)
         {
-            var mark = context.MarkTrace();
+            var mark = context.MarkTrail();
             var argIndexers = PredicateArgumentIndexer.ArglistIndexers(args);
             entriesListUsed = true;
             foreach (var entry in Entries)
@@ -208,7 +208,7 @@ namespace Prolog
         IEnumerable<CutState> TestShuffledClauses(object[] args, PrologContext context, ushort myFrame)
         {
             entriesListUsed = true;
-            var mark = context.MarkTrace();
+            var mark = context.MarkTrail();
             var shuffler = new Shuffler((ushort)Entries.Count);
             var argIndexers = PredicateArgumentIndexer.ArglistIndexers(args);
             while (!shuffler.Done)

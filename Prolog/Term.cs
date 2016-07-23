@@ -410,7 +410,7 @@ namespace Prolog
 
         internal static IEnumerable<bool> UnifyArraysFast(object[] a1, object[] a2, PrologContext context)
         {
-            int mark = context.MarkTrace();
+            int mark = context.MarkTrail();
             if (UnifyArrays(a1, a2, context))
                 yield return false;
             context.RestoreVariables(mark);
@@ -602,6 +602,15 @@ namespace Prolog
             return Unifiable(v1, v2, ref vars, ref values);
         }
 
+        /// <summary>
+        /// Determine if V1 and V2 can be unified, without actually unifying them.
+        /// If they are unifiable, determine the substitions that would be necessary to unify them.
+        /// </summary>
+        /// <param name="v1">Value to test for unifiability</param>
+        /// <param name="v2">Other value to test</param>
+        /// <param name="vars">Variables in unifier</param>
+        /// <param name="values">Values in unifier</param>
+        /// <returns>True if V1 and V2 can be unified.</returns>
         internal static bool Unifiable(object v1, object v2, ref List<LogicVariable> vars, ref List<object> values)
         {
             v1 = CanonicalizeWithExplicitBindingList(v1, vars, values);
@@ -642,6 +651,13 @@ namespace Prolog
             return v1.Equals(v2);
         }
 
+        /// <summary>
+        /// Perform substitutions from var/values, and dereference any variables
+        /// </summary>
+        /// <param name="value">Value to canonicalize</param>
+        /// <param name="vars">Variables to be substituted</param>
+        /// <param name="values">Values to substitute for the variables</param>
+        /// <returns>Substituted and dereferenced value.</returns>
         static object CanonicalizeWithExplicitBindingList(object value, List<LogicVariable> vars, List<object> values)
         {
             value = Deref(value);

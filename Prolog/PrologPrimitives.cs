@@ -872,11 +872,61 @@ namespace Prolog
             return Term.UnifyAndReturnCutState(goal, args[1]);
         }
 
-        private static readonly Symbol SDif = Symbol.Intern("dif");
-
         private static IEnumerable<CutState> DifImplementation(object[] args, PrologContext context)
         {
-            if (args.Length != 2) throw new ArgumentCountException("dif", args, "term1", "term2");
+            switch (args.Length)
+            {
+                case 0:
+                case 1:
+                    return CutStateSequencer.Succeed();
+
+                case 2:
+                    return Dif2(args, context);
+
+                default:
+                    return DifN(args, context);
+            }
+        }
+
+
+        private static IEnumerable<CutState> DifN(object[] args, PrologContext context)
+        {
+            List<LogicVariable> vars = new List<LogicVariable>();
+            List<object> values = new List<object>();
+            var trailMark = context.MarkTrail();
+
+            for (int i = 0; i < args.Length - 1; i++)
+            {
+                var vi = Term.Deref(args[i]);
+
+                for (int j = i+1; j < args.Length; j++)
+                {
+                    var vj = Term.Deref(args[j]);
+                    vars.Clear();
+                    values.Clear();
+                    if (Term.Unifiable(vi, vj, ref vars, ref values))
+                    {
+                        if (vars.Count == 0)
+                        {
+                            // The terms are already equal
+                            context.RestoreVariables(trailMark);
+                            return CutStateSequencer.Fail();
+                        }
+                        // Unifying them would require binding a variable; delay this call to Dif on that variable.
+                        vars[0].AddSuspendedGoalSavingToTrail(new Structure(SDif, vi, vj), context);
+                    }
+                    // else they're not unifiable, so we don't need to post a delayed goal.
+                }
+            }
+            
+            // Nothing can make these terms equal
+            return CutStateSequencer.SucceedAndRestoreTrail(context, trailMark);
+        }
+
+        private static readonly Symbol SDif = Symbol.Intern("dif");
+
+        private static IEnumerable<CutState> Dif2(object[] args, PrologContext context)
+        {
             List<LogicVariable> vars = null;
             List<object> values = null;
             if (Term.Unifiable(args[0], args[1], ref vars, ref values))
