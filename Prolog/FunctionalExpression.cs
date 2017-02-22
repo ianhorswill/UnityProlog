@@ -33,6 +33,7 @@ namespace Prolog
 {
     public static class FunctionalExpression
     {
+        static readonly System.Random Random = new System.Random();
         public static object Eval(object term, PrologContext context)
         {
             term = Term.Deref(term);
@@ -124,6 +125,16 @@ namespace Prolog
                     if (t.Arguments.Length != 2)
                         throw new ArgumentCountException("max", t.Arguments, "number1", "number2");
                     return GenericArithmetic.Max(Eval(t.Arguments[0], context), Eval(t.Arguments[1], context));
+
+                case "random_integer":
+                    if (t.Arguments.Length != 2)
+                        throw new ArgumentCountException("random_integer", t.Arguments, "min", "max");
+                {
+                    int low = Convert.ToInt32(Eval(t.Arguments[0], context));
+                    int high = Convert.ToInt32(Eval(t.Arguments[1], context));
+                    int range = high + 1 - low;
+                    return low + Random.Next() % range;
+                }
 
                 case "magnitude":
                 {

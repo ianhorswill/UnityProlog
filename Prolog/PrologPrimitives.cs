@@ -100,8 +100,8 @@ namespace Prolog
                 "Unifies GOAL with the goal frozen on TERM, if TERM is an unbound variable with a frozen goal; otherwise unifies GOAL with true.",
                 "?term", "-goal");
             DefinePrimitive("dif", DifImplementation, "comparisons,constraint programming",
-                "Requires that TERM1 and TERM2 never be equal.  If they are, the predicate fails.  If they are not, it forces any future unifications that would make them equal to fail.",
-                "?term1", "?term2");
+                "Requires that the TERMs never be equal.  If they are, the predicate fails.  If they are not, it forces any future unifications that would make them equal to fail.",
+                "?term1", "?term2", "...");
             DefinePrimitive("maplist", MapListImplementation, "list predicates,meta-logical predicates",
                 "True if PREDICATE is true of all successive pairs of elements from LIST1 and LIST2.",
                 ":predicate", "?list1", "?list2");
