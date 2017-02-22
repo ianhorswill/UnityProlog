@@ -26,6 +26,7 @@
 using System;
 
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace Prolog
 {
@@ -104,7 +105,8 @@ namespace Prolog
                 : new KnowledgeBase(
                     gameObject.name,
                     gameObject,
-                    parentKB == null ? GameObject.Find(GlobalKBGameObjectName).KnowledgeBase() : parentKB.KnowledgeBase);
+                    parentKB == null ? GameObject.Find(GlobalKBGameObjectName).KnowledgeBase()
+                                       : parentKB.KnowledgeBase);
 
             // Add UID counter.
             ELNode.Store(kb.ELRoot/Symbol.Intern("next_uid")%0);
@@ -112,13 +114,19 @@ namespace Prolog
             try
             {
                 foreach (var file in SourceFiles)
-                    kb.Consult(file);
+                    kb.Consult(ExpandFileName(file));
             }
             catch (Exception)
             {
                 Debug.Break(); // Pause the game
                 throw;
             }
+        }
+
+        string ExpandFileName(string path)
+        {
+            return path.Replace("$NAME", gameObject.name)
+                       .Replace("$LEVEL", SceneManager.GetActiveScene().name);
         }
 
         /// <summary>
